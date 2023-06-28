@@ -2,6 +2,7 @@
 using ReadRate.Models;
 using System.Data;
 using System.Data.SqlClient;
+using System.Xml.Linq;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,9 +14,11 @@ namespace ReadRate.Controllers
     {
         SqlConnection conn;
         private readonly IConfiguration _configuration;
-        public UserController(IConfiguration configuration)
+        IHttpContextAccessor Context;
+        public UserController(IConfiguration configuration, IHttpContextAccessor context)
         {
             _configuration = configuration;
+            Context = context;
         }
 
         [HttpPost, Route("[action]", Name = "Login")]
@@ -28,6 +31,7 @@ namespace ReadRate.Controllers
                 if (user != null && !string.IsNullOrWhiteSpace(user.UserEmail) && !string.IsNullOrWhiteSpace(user.Password))
                 {
                     conn = new SqlConnection(_configuration["ConnectionStrings:SqlConn"]);
+                    conn.Open();
                     using (conn)
                     {
                         SqlCommand cmd = new SqlCommand("ValidateLogin", conn);
@@ -45,7 +49,9 @@ namespace ReadRate.Controllers
                             userModel.Password = dt.Rows[0]["Password"].ToString();
                             userModel.SecurityQn = dt.Rows[0]["SecurityQn"].ToString();
                             userModel.SecurityAns = dt.Rows[0]["SecurityAns"].ToString();
-
+                            Context.HttpContext.Session.SetString("UserName", userModel.UserName);
+                            Context.HttpContext.Session.SetInt32("UserId", userModel.UserId);
+                            Context.HttpContext.Session.SetString("UserEmail", userModel.UserEmail);
                             userModel.result.result = true;
                             userModel.result.message = "success";
                         }
@@ -61,6 +67,7 @@ namespace ReadRate.Controllers
                     userModel.result.result = false;
                     userModel.result.message = "Please enter username and password";
                 }
+                conn.Close();
             }
             catch (Exception ex)
             {
@@ -122,6 +129,7 @@ namespace ReadRate.Controllers
                 {
 
                     conn = new SqlConnection(_configuration["ConnectionStrings:SqlConn"]);
+                    conn.Open();
                     using (conn)
                     {
                         SqlCommand cmd = new SqlCommand("UpdateUser", conn);
@@ -143,6 +151,7 @@ namespace ReadRate.Controllers
                             result.message = "Error in Updating the profile... Try Again";
                         }
                     }
+                    conn.Close();
                 }
             }
             catch (Exception ex)
@@ -161,16 +170,17 @@ namespace ReadRate.Controllers
             try
             {
                 conn = new SqlConnection(_configuration["ConnectionStrings:SqlConn"]);
+                conn.Open();
                 using (conn)
                 {
-                    SqlCommand cmd = new SqlCommand("UpdateUser", conn);
+                    SqlCommand cmd = new SqlCommand("DeleteUser", conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@UserId", UserId);
                     int rowsAffected = cmd.ExecuteNonQuery();
                     if (rowsAffected > 0)
                     {
                         result.result = true;
-                        result.message = "User Account Has been Updated successfully";
+                        result.message = "User Account Has been Deleted successfully";
 
                     }
                     else
@@ -180,6 +190,7 @@ namespace ReadRate.Controllers
                     }
 
                 }
+                conn.Close();
             }
             catch (SqlException ex)
             {

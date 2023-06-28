@@ -7,5 +7,6 @@
         public int UserId { get; set; }
         public string Reply { get; set; }
         public DateTime CreatedDate { get; set; }
+        public virtual CritiqueModel CritiqueModel { get; set; }
     }
 }

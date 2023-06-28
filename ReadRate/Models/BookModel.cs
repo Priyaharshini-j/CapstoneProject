@@ -8,6 +8,7 @@
         public string BookVol { get; set; }
         public string Author { get; set; }
         public string genre { get; set; }
+        public virtual RatingModel Rating { get; set; }
 
     }
 

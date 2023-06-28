@@ -7,5 +7,6 @@
         public int CommunityMemberId { get; set; }
         public string Reply { get; set; }
         public DateTime CreatedDate { get; set; }
+        public virtual CommunityDiscussion CommunityDiscussion { get; set;}
     }
 }

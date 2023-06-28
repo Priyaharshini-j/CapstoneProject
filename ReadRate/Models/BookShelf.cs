@@ -7,5 +7,6 @@
         public int BookId { get; set; }
         public string ReadingStatus { get; set; }
         public DateTime CreatedDate { get; set; }
+        public virtual BookModel Book { get; set; }
     }
 }

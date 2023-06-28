@@ -134,3 +134,98 @@ CONSTRAINT [Fk_Shelves_UserId] FOREIGN KEY (UserId) REFERENCES Users(UserId),
 CONSTRAINT [Fk_Shelves_BookId] FOREIGN KEY (BookId) REFERENCES Book(BookId)
 );
 
+--CREATING THE TABLE FOR THE SECONDARY TABLE FOR THE PROJECT
+
+--CREATING TABLE FOR COMMUNITYMEMBER
+CREATE TABLE CommunityMembers
+(
+CommunityMemberId INT IDENTITY(1,1) PRIMARY KEY,
+CommunityId INT NOT NULL,
+UserId INT NOT NULL,
+CreatedDate DATETIME DEFAULT SYSDATETIME(),
+CONSTRAINT [Fk_CommMember_CommId] FOREIGN KEY (CommunityId) REFERENCES Community(CommunityId),
+CONSTRAINT [Fk_CommMember_UserId] FOREIGN KEY (UserId) REFERENCES Users(UserId)
+);
+
+
+
+
+--Creating table for the CommunityDiscussion
+CREATE TABLE CommunityDiscussion
+(
+DiscussionId INT IDENTITY(1,1) PRIMARY KEY,
+CommunityId INT NOT NULL,
+CommunityMemberId INT  NOT NULL,
+Discussion VARCHAR(MAX) NOT NULL,
+CreatedDate DATETIME DEFAULT SYSDATETIME(),
+CONSTRAINT [Fk_CommDiscuss_CommId] FOREIGN KEY (CommunityId) REFERENCES Community(CommunityId),
+CONSTRAINT [Fk_CommDiscuss_MemId] FOREIGN KEY (CommunityMemberId) REFERENCES CommunityMembers(CommunityMemberId)
+);
+
+--CREATING TABLE FOR THE REPLIES FOR THE Discussion
+CREATE TABLE DiscussionReply
+(
+DiscussionReplyId INT IDENTITY(1,1) PRIMARY KEY,
+DiscussionId INT NOT NULL,
+CommunityMemberId INT NOT NULL,
+DiscussionReply VARCHAR(MAX) NOT NULL,
+CreatedDate DATETIME DEFAULT SYSDATETIME(),
+CONSTRAINT [Fk_DiscussReply_CommId] FOREIGN KEY (DiscussionId) REFERENCES CommunityDiscussion(DiscussionId),
+CONSTRAINT [Fk_DiscussReply_MemId] FOREIGN KEY (CommunityMemberId) REFERENCES CommunityMembers(CommunityMemberId)
+);
+
+--Creating the table for Post Like/Dislike
+CREATE TABLE PostLike
+(
+LikeId INT IDENTITY(1,1) PRIMARY KEY,
+PostId INT NOT NULL,
+UserId INT NOT NULL,
+LikeStatus BIT,
+CreatedDate DATETIME DEFAULT SYSDATETIME(),
+CONSTRAINT [Fk_PostLike_UserId] FOREIGN KEY (UserId) REFERENCES Users(UserId),
+CONSTRAINT [Fk_PostId] FOREIGN KEY (PostId) REFERENCES Post(PostId),
+);
+
+
+--CREATING TABLE FOR THE REPLIES FOR THE CRITIQUE
+CREATE TABLE CritiqueReply
+(
+CritiqueReplyId INT IDENTITY(1,1) PRIMARY KEY,
+CritiqueId INT NOT NULL,
+UserId INT NOT NULL,
+Reply VARCHAR(MAX) NOT NULL,
+CreatedDate DATETIME DEFAULT SYSDATETIME(),
+CONSTRAINT [Fk_CritiqueReply_CritiqueId] FOREIGN KEY (CritiqueId) REFERENCES Critique(CritiqueId),
+CONSTRAINT [Fk_CritiqueReply_UserId] FOREIGN KEY (UserId) REFERENCES Users(UserId)
+);
+
+--Creating the table for Critique Like/Dislike
+CREATE TABLE CritiqueLike
+(
+CritiqueLikeId INT IDENTITY(1,1) PRIMARY KEY,
+CritiqueId INT NOT NULL,
+UserId INT NOT NULL,
+LikeStatus BIT,
+CreatedDate DATETIME DEFAULT SYSDATETIME(),
+CONSTRAINT [Fk_CritiqueLike_CritiqueId] FOREIGN KEY (CritiqueId) REFERENCES Critique(CritiqueId),
+CONSTRAINT [Fk_CritiqueLike_UserId] FOREIGN KEY (UserId) REFERENCES Users(UserId)
+);
+
+--Creating the table for followers table
+CREATE TABLE Following
+(
+FollowingId INT IDENTITY(1,1) PRIMARY KEY,
+UserId INT NOT NUll,
+FollowingUserId INT NOT NULL,
+CreatedDate DATE DEFAULT SYSDATETIME(),
+CONSTRAINT [Fk_Following_FollowerId] FOREIGN KEY (UserId) REFERENCES Users(UserId),
+CONSTRAINT [Fk_Following_FollowingId] FOREIGN KEY (FollowingUserId) REFERENCES Users(UserId),
+);
+
+
+
+
+--Community->CommunityMembers->CommunityDiscussion->DiscussionReply
+--Critic->CritiqueReply
+--Critic->CritiqueLike
+--Post->PostLike

@@ -1,10 +1,10 @@
 ﻿namespace ReadRate.Models
 {
-    public class CommunityMember
+    public class Following
     {
-        public int CommunityMemberId { get; set; }
-        public int CommunityId { get; set; }
+        public int FollowingId { get; set; }
         public int UserId { get; set; }
+        public int FollowingUserId { get; set; }
         public DateTime CreatedDate { get; set; }
     }
 }

@@ -4,5 +4,31 @@
 
 namespace ReadRate.Controllers
 {
-   
+    [HttpGet, Route("[action]", Name = "BookCommunityList")]
+    public 
+
+    [HttpPost, Route("[action]", Name = "")]
+
+    [HttpPost, Route("[action]", Name = "")]
+
+    [HttpPost, Route("[action]", Name = "")]
+
+    [HttpPost, Route("[action]", Name = "")]
+
+    [HttpPost, Route("[action]", Name = "")]
+
+    [HttpPost, Route("[action]", Name = "")]
+
+    [HttpPost, Route("[action]", Name = "")]
+
+    [HttpPost, Route("[action]", Name = "")]
+
+    [HttpPost, Route("[action]", Name = "")]
+
+
+
+
+
+
+
 }

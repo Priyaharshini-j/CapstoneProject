@@ -14,7 +14,6 @@ namespace ReadRate.Controllers
         SqlConnection _conn;
         private readonly SupplementaryController supplementaryController;
         private readonly IConfiguration configuration;
-        IHttpContextAccessor Context;
         HttpClient client = new HttpClient();
         public CritiqueController(IConfiguration _configuration, SupplementaryController _controller)
         {

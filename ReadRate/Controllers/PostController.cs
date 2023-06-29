@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ReadRate.Models;
 using System.Data;
+using Microsoft.AspNetCore.Http;
 using System.Data.SqlClient;
 
 namespace ReadRate.Controllers

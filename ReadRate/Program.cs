@@ -1,5 +1,6 @@
 using ReadRate.Controllers;
 
+
 namespace ReadRate
 {
     public class Program
@@ -15,6 +16,12 @@ namespace ReadRate
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddScoped<SupplementaryController>();
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession();
+
+            builder.Services.AddHttpContextAccessor();
+
+
 
             var app = builder.Build();
 
@@ -27,6 +34,7 @@ namespace ReadRate
 
             app.UseAuthorization();
 
+            app.UseSession();
 
             app.MapControllers();
 

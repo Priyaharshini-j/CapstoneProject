@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 using ReadRate.Models;
+using Microsoft.AspNetCore.Http;
 using System.Reflection.Metadata.Ecma335;
 using System.Data;
 using Newtonsoft.Json;
@@ -22,10 +23,12 @@ namespace ReadRate.Controllers
         private readonly IConfiguration configuration;
         IHttpContextAccessor Context;
         HttpClient client = new HttpClient();
-        public BookController(IConfiguration _configuration, SupplementaryController _controller)
+
+        public BookController(IConfiguration _configuration, IHttpContextAccessor _context, SupplementaryController _controller)
         {
             supplementaryController = _controller;
             configuration = _configuration;
+            Context = _context;
         }
 
         [HttpPost, Route("[action]", Name = "BookCommunityList")]
@@ -81,8 +84,63 @@ namespace ReadRate.Controllers
             }
             return communities;
         }
-        
 
+        [HttpGet, Route("[action]", Name = "UserCommunity")]
+        public List<BookCommunity> UserCommunityList()
+        {
+            List<BookCommunity> communities = new List<BookCommunity>();
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    int? userId = Context.HttpContext.Session.GetInt32("UserId");
+                    SqlCommand cmd = new SqlCommand("GetCommunityByUserId", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        Console.WriteLine("Found");
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            BookCommunity community = new BookCommunity();
+                            community.CommunityId = Convert.ToInt32(dr["CommunityId"]);
+                            community.CommunityName = dr["CommunityName"].ToString();
+                            community.CommunityDesc = dr["CommunityDesc"].ToString();
+                            community.CommunityAdmin = Convert.ToInt32(dr["CommunityAdmin"]);
+                            community.BookId = Convert.ToInt32(dr["BookId"]);
+                            community.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                            communities.Add(community);
+
+                        }
+                    }
+                    else
+                    {
+                        BookCommunity bookCommunity = new BookCommunity();
+                        bookCommunity.result = new Models.Results();
+                        bookCommunity.result.result = false;
+                        bookCommunity.result.message = "No community was created by the User";
+                        communities.Add(bookCommunity);
+                    }
+                    _conn.Close();
+                }
+            }
+            catch (SqlException ex)
+            {
+                BookCommunity bookCommunity = new BookCommunity();
+                bookCommunity.result = new Models.Results();
+                bookCommunity.result.result = false;
+                bookCommunity.result.message = ex.Message;
+                communities.Add(bookCommunity);
+                Console.WriteLine(ex.Message);
+            }
+            
+            return communities;
+        }
 
 
 

@@ -133,6 +133,14 @@ BEGIN
 SELECT * FROM Community WHERE BookId=@BookId;
 END;
 
+CREATE OR ALTER PROCEDURE GetCommunityByUserId
+@UserID INT
+AS
+BEGIN
+SELECT * FROM Community WHERE CommunityAdmin = @UserID;
+END;
+
+
 --CREATING TABLE FOR Post
 CREATE TABLE Post
 (

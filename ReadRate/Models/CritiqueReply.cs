@@ -8,5 +8,6 @@
         public string Reply { get; set; }
         public DateTime CreatedDate { get; set; }
         public virtual CritiqueModel CritiqueModel { get; set; }
+        public Results result { get; set; }
     }
 }

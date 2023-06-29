@@ -8,5 +8,6 @@
         public string CritiqueDesc { get; set; }
         public DateTime CreatedDate { get; set; }
         public virtual CritiqueLike Likes { get; set; }
+        public Results result { get; set; }
     }
 }

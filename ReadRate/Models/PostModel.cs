@@ -8,5 +8,6 @@
         public int BookId { get; set; }
         public byte[] Picture { get; set; }
         public DateTime CreatedDate { get; set; }
+        public Results result { get; set; }
     }
 }

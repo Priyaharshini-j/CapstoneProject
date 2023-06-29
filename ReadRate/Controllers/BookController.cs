@@ -5,6 +5,8 @@ using ReadRate.Models;
 using System.Reflection.Metadata.Ecma335;
 using System.Data;
 using Newtonsoft.Json;
+using System.Linq.Expressions;
+using Newtonsoft.Json.Linq;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -12,69 +14,117 @@ namespace ReadRate.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class BookController : ControllerBase
     {
         SqlConnection _conn;
         private readonly IConfiguration configuration;
         IHttpContextAccessor Context;
         HttpClient client = new HttpClient();
-        public UserController(IConfiguration _configuration)
+        public BookController(IConfiguration _configuration)
         {
             configuration = _configuration;
         }
 
-        [HttpGet, Route("[action]", Name = "BookCommunityList")]
-        public Models.Results CommunityList(int ISBN)
+        [HttpPost, Route("[action]", Name = "BookCommunityList")]
+        public async Task<List<BookCommunity>> CommunityList(BookModel book)
         {
-            Models.Results result = new Models.Results();
-            int bookId = getBookIdByISBN(ISBN);
-
-
-            return result;
-        }
-        public async Task<int> getBookIdByISBN(int ISBN)
-        {
-            int bookId = 0;
+            List<BookCommunity> communities = new List<BookCommunity>();
+            int bookId = await getBookIdByISBN(book);
             try
             {
-                _conn = new SqlConnection(_configuration["ConnectionStrings:SqlConn"]);
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
                 _conn.Open();
                 using (_conn)
                 {
-                    SqlCommand cmd = new SqlCommand("GetBookId",_conn);
+                    SqlCommand cmd = new SqlCommand("GetCommunityBookId", _conn);
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@ISBN", ISBN);
+                    cmd.Parameters.AddWithValue("@BookId", bookId);
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     adapter.Fill(dt);
                     if (dt != null && dt.Rows.Count > 0)
                     {
-                        bookId = (int) dt.Rows[0]["BookId"];
-                    }
-                    if(dt == null && dt.Rows.Count == 0)
-                    {
-                        // Set the base URL of the third-party API
-                        string baseUrl = "https://api.example.com/";
-
-                        // Set the endpoint for retrieving book details
-                        string endpoint = $"books/{ISBN}";
-
-                        // Send the GET request to the third-party API
-                        HttpResponseMessage response = await client.GetAsync(baseUrl + endpoint);
-
-                        // Check if the request was successful (status code 200)
-                        if (response.IsSuccessStatusCode)
+                        Console.WriteLine("Found");
+                        foreach (DataRow dr in dt.Rows)
                         {
-                            // Read the response content as a string
-                            string responseContent = await response.Content.ReadAsStringAsync();
-
-                            // Deserialize the response content into a Book object
-                            Book book = JsonConvert.DeserializeObject<Book>(responseContent);
-
-                            // Process the book details or save them to the database
-
+                            BookCommunity community = new BookCommunity();
+                            community.CommunityId = Convert.ToInt32(dr["CommunityId"]);
+                            community.CommunityName = dr["CommunityName"].ToString();
+                            community.CommunityDesc = dr["CommunityDesc"].ToString();
+                            community.CommunityAdmin = Convert.ToInt32(dr["CommunityAdmin"]);
+                            community.BookId = Convert.ToInt32(dr["BookId"]);
+                            community.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                            communities.Add(community);
                         }
                     }
+                    else
+                    {
+                        BookCommunity comm = new BookCommunity();
+                        comm.result = new Models.Results();
+                        comm.result.result = true;
+                        comm.result.message = "No Communities found";
+                        communities.Add(comm);
+                        Console.WriteLine("No Communities Found");
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                BookCommunity comm = new BookCommunity();
+                comm.result = new Models.Results();
+                comm.result.result = false;
+                comm.result.message =ex.Message;
+                communities.Add(comm);
+            }
+            return communities;
+        }
+
+        [HttpPost, Route("[action]", Name = "GETCommunityList")]
+        public async Task<int> getBookIdByISBN(BookModel book)
+        {
+            int bookId = 0;
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("GetBookId", _conn);
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ISBN", book.ISBN);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        Console.WriteLine("Found");
+                        bookId = (int)dt.Rows[0]["BookId"];
+                    }
+                    if (bookId == 0)
+                    {
+                        Console.WriteLine("Not Found");
+                        try
+                        {
+                            cmd = new SqlCommand("InsertBook", _conn);
+                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                            cmd.Parameters.AddWithValue("@ISBN", book.ISBN);
+                            cmd.Parameters.AddWithValue("@BookName", book.BookName);
+                            cmd.Parameters.AddWithValue("@BookVol", book.BookVol);
+                            cmd.Parameters.AddWithValue("@Genre", book.Genre);
+                            cmd.Parameters.AddWithValue("@Author", book.Author);
+                            cmd.Parameters.AddWithValue("@CoverUrl", book.CoverUrl);
+                            cmd.Parameters.AddWithValue("@BookDesc", book.BookDesc);
+                            cmd.Parameters.AddWithValue("@Publisher", book.Publisher);
+                            cmd.Parameters.AddWithValue("@PublishedDate", book.PublishedDate);
+                            cmd.ExecuteNonQuery();
+                            bookId = await getBookIdByISBN(book);
+                        }
+                        catch (SqlException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {

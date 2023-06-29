@@ -8,5 +8,6 @@
         public bool LikeStatus { get; set; }
         public DateTime CreatedDate { get; set; }
         public PostModel Post { get; set; }
+        public Results result { get; set; }
     }
 }

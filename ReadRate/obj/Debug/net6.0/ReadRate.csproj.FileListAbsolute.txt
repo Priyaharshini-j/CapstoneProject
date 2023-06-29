@@ -36,3 +36,4 @@ C:\CapstoneProject\ReadRate\obj\Debug\net6.0\refint\ReadRate.dll
 C:\CapstoneProject\ReadRate\obj\Debug\net6.0\ReadRate.pdb
 C:\CapstoneProject\ReadRate\obj\Debug\net6.0\ReadRate.genruntimeconfig.cache
 C:\CapstoneProject\ReadRate\obj\Debug\net6.0\ref\ReadRate.dll
+C:\CapstoneProject\ReadRate\bin\Debug\net6.0\Newtonsoft.Json.dll

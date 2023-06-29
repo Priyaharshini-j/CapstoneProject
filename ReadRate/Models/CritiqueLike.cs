@@ -7,5 +7,6 @@
         public int UserId { get; set; }
         public bool LikeStatus { get; set; }
         public DateTime CreatedDate { get; set; }
+        public Results result { get; set; }
     }
 }

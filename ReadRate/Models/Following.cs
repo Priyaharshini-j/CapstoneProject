@@ -8,5 +8,6 @@
         public DateTime CreatedDate { get; set; }
         public virtual UserModel followerDetail { get; set; }
         public virtual UserModel userDetail { get; set; }
+        public Results result { get; set; }
     }
 }

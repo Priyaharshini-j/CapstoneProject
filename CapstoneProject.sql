@@ -162,7 +162,13 @@ BEGIN
 SELECT * FROM Post WHERE BookId= @BookId;
 END;
 
-
+--Creating the procedure for retreiving the post created ny the users
+CREATE OR ALTER PROCEDURE GetUsersPost
+@UserId INT
+AS
+BEGIN
+SELECT * FROM Post WHERE UserId= @UserId;
+END;
 
 
 

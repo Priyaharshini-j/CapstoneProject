@@ -95,6 +95,7 @@ namespace ReadRate.Controllers
                 _conn.Open();
                 using (_conn)
                 {
+                   // Context.HttpContext.Session.SetInt32("UserId", 1);
                     int? userId = Context.HttpContext.Session.GetInt32("UserId");
                     SqlCommand cmd = new SqlCommand("GetCommunityByUserId", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;

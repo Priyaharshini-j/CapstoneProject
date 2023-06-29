@@ -68,5 +68,56 @@ namespace ReadRate.Controllers
             }
             return bookId;
         }
+
+        public BookModel GetBookByBookId(int bookId)
+        {
+            BookModel book = new BookModel();
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("GetBookByBookId", _conn);
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@BookId", bookId);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            book.BookId = Convert.ToInt32(dr["BookId"]);
+                            book.ISBN = dr["ISBN"].ToString();
+                            book.BookName = dr["BookName"].ToString();
+                            book.BookVol = dr["BookVol"].ToString();
+                            book.Genre = dr["Genre"].ToString();
+                            book.Author = dr["Author"].ToString();
+                            book.CoverUrl = dr["CoverUrl"].ToString();
+                            book.BookDesc = dr["BookDesc"].ToString();
+                            book.Publisher = dr["Publisher"].ToString();
+                            book.PublishedDate = dr["PublishedDate"].ToString();
+                        }
+                    }
+                    else
+                    {
+                        book.result = new Models.Results();
+                        book.result.result = true;
+                        book.result.message = "Unable to fetch the Book Details";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                book.result = new Models.Results();
+                book.result.result = false;
+                book.result.message = ex.Message;
+                Console.WriteLine(ex.Message);
+            }
+            return book;
+        } 
     }
+
 }

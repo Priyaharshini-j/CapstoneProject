@@ -133,9 +133,6 @@ BEGIN
 SELECT * FROM Community WHERE BookId=@BookId;
 END;
 
-
-
-
 --CREATING TABLE FOR Post
 CREATE TABLE Post
 (
@@ -148,6 +145,20 @@ CreatedDate DATE DEFAULT SYSDATETIME(),
 CONSTRAINT [Fk_Post_UserId] FOREIGN KEY (UserId) REFERENCES Users(UserId),
 CONSTRAINT [Fk_Post_BookId] FOREIGN KEY (BookId) REFERENCES Book(BookId),
 );
+
+--creating the procedure to retrive the post based on the bookId
+CREATE OR ALTER PROCEDURE GetPostByBookId
+@BookId INT
+AS
+BEGIN
+SELECT * FROM Post WHERE BookId= @BookId;
+END;
+
+
+
+
+
+
 
 --Creating the table for Critic
 CREATE TABLE Critique
@@ -184,6 +195,15 @@ CreatedDate DATE DEFAULT SYSDATETIME(),
 CONSTRAINT [Fk_Rating_UserId] FOREIGN KEY (UserId) REFERENCES Users(UserId),
 CONSTRAINT [Fk_Rating_BookId] FOREIGN KEY (BookId) REFERENCES Book(BookId),
 );
+
+--creating procedure for the rating retrival based on bookId
+CREATE OR ALTER PROCEDURE getRatingsByBookId
+@BookId INT
+AS
+BEGIN
+SELECT * FROM Rating WHERE BookId= @BookId;
+END;
+
 
 
 

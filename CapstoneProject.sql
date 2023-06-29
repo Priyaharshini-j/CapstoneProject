@@ -49,7 +49,7 @@ CREATE OR ALTER PROCEDURE UpdateUser
 @SecurityAns VARCHAR(225)
 AS
 BEGIN
-UPDATE Users SET Password =@Password , SecurityQn = @SecurityQn, SecurityAns = @SecurityAns
+UPDATE Users SET Password =@Password , SecurityQn = @SecurityQn, SecurityAns = @SecurityAns WHERE UserId= @UserId;
 END;
 
 --Creating Procedure to Delete User Profile
@@ -69,9 +69,20 @@ BookName VARCHAR(225),
 BookVol VARCHAR(50),
 Genre VARCHAR(MAX) NOT NULL,
 Author VARCHAR(100),
-Publisher VARCHAR(200)
+CoverUrl VARCHAR(MAX),
+BookDesc VARCHAR(MAX),
+Publisher VARCHAR(200),
+PublishedDate DATETIME
 );
 
+CREATE OR ALTER PROCEDURE GetBookId
+@ISBN VARCHAR(50)
+AS
+BEGIN
+SELECT * FROM Book WHERE ISBN=@ISBN;
+END;
+
+SELECT * FROM Book
 --CREATING THE TABLE FOR COMMUNITY
 CREATE TABLE Community
 (
@@ -84,6 +95,46 @@ CreatedDate DATETIME  DEFAULT SYSDATETIME() NOT NULL,
 CONSTRAINT [Fk_UserId] FOREIGN KEY (CommunityAdmin) REFERENCES Users(UserId),
 CONSTRAINT [Fk_BookId] FOREIGN KEY (BookId) REFERENCES Book(BookId),
 );
+
+--Creating procedure for retriving bookID
+CREATE OR ALTER PROCEDURE GetBookId
+@ISBN VARCHAR(50)
+AS
+BEGIN
+SELECT * FROM dbo.Book WHERE ISBN = @ISBN;
+END;
+
+--Creating procdure for inserting and returning book id
+CREATE OR ALTER PROCEDURE InsertBook
+    @ISBN VARCHAR(50),
+    @BookName VARCHAR(225),
+    @BookVol VARCHAR(50),
+    @Genre VARCHAR(MAX),
+    @Author VARCHAR(100),
+    @CoverUrl VARCHAR(MAX),
+    @bookDesc VARCHAR(MAX),
+    @Publisher VARCHAR(200),
+    @PublishedDate DATETIME,
+    @BookId INT OUTPUT
+AS
+BEGIN
+    INSERT INTO Book (ISBN, BookName, BookVol, Genre, Author, CoverUrl, BookDesc, Publisher, PublishedDate)
+    VALUES (@ISBN, @BookName, @BookVol, @Genre, @Author, @CoverUrl, @bookDesc, @Publisher, @PublishedDate)
+END;
+
+
+
+--Creating the procedure to retrive the community by BookId
+
+CREATE OR ALTER PROCEDURE GetCommunityBookId
+@BookId INT
+AS
+BEGIN
+SELECT * FROM Community WHERE BookId=@BookId;
+END;
+
+
+
 
 --CREATING TABLE FOR Post
 CREATE TABLE Post
@@ -110,6 +161,18 @@ CONSTRAINT [Fk_Critique_UserId] FOREIGN KEY (UserId) REFERENCES Users(UserId),
 CONSTRAINT [Fk_Critique_BookId] FOREIGN KEY (BookId) REFERENCES Book(BookId),
 );
 
+--Get Critique by bookID
+CREATE OR ALTER PROCEDURE GetCritiqueByBookId
+@BookId INT
+AS
+BEGIN
+SELECT * FROM Critique WHERE BookId = @BookId;
+END;
+
+
+
+
+
 --CREATING TABLE FOR Rating 
 CREATE TABLE Rating
 (
@@ -121,6 +184,8 @@ CreatedDate DATE DEFAULT SYSDATETIME(),
 CONSTRAINT [Fk_Rating_UserId] FOREIGN KEY (UserId) REFERENCES Users(UserId),
 CONSTRAINT [Fk_Rating_BookId] FOREIGN KEY (BookId) REFERENCES Book(BookId),
 );
+
+
 
 --CREATING TABLE FOR BookShelves
 CREATE TABLE BookShelf
@@ -146,8 +211,6 @@ CreatedDate DATETIME DEFAULT SYSDATETIME(),
 CONSTRAINT [Fk_CommMember_CommId] FOREIGN KEY (CommunityId) REFERENCES Community(CommunityId),
 CONSTRAINT [Fk_CommMember_UserId] FOREIGN KEY (UserId) REFERENCES Users(UserId)
 );
-
-
 
 
 --Creating table for the CommunityDiscussion
@@ -229,3 +292,48 @@ CONSTRAINT [Fk_Following_FollowingId] FOREIGN KEY (FollowingUserId) REFERENCES U
 --Critic->CritiqueReply
 --Critic->CritiqueLike
 --Post->PostLike
+
+SELECT * FROM PostLike;
+SELECT * FROM Post
+SELECT * FROM CritiqueLike
+SELECT * FROM CritiqueReply
+SELECT * FROM Critique
+SELECT * FROM BookShelf
+SELECT * FROM Rating
+SELECT * FROM DiscussionReply
+SELECT * FROM CommunityDiscussion
+SELECT * FROM CommunityMembers
+SELECT * FROM Community
+SELECT * FROM Book
+SELECT * FROM Users
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DROP TABLE PostLike;
+DROP TABLE Post
+DROP TABLE CritiqueLike
+DROP TABLE CritiqueReply
+DROP TABLE Critique
+DROP TABLE BookShelf
+DROP TABLE Rating
+DROP TABLE DiscussionReply
+DROP TABLE CommunityDiscussion
+DROP TABLE CommunityMembers
+DROP TABLE Community
+DROP TABLE Book
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE

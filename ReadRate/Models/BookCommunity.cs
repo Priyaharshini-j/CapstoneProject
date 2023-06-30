@@ -10,4 +10,12 @@
         public DateTime CreatedDate { get; set; }
         public Results result { get; set; }
     }
+
+    public class CreateCommunity
+    {
+        public string CommunityName { get; set; }
+        public string CommunityDesc { get; set; }
+        public string ISBN { get; set; }
+
+    }
 }

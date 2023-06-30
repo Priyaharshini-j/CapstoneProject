@@ -25,23 +25,13 @@ namespace ReadRate.Controllers
                 _conn.Open();
                 using (_conn)
                 {
-                    SqlCommand cmd = new SqlCommand("GetBookId", _conn);
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@ISBN", book.ISBN);
-                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-                    if (dt != null && dt.Rows.Count > 0)
-                    {
-                        Console.WriteLine("Found");
-                        bookId = (int)dt.Rows[0]["BookId"];
-                    }
+                    bookId = await GetBookId(book.ISBN.ToString());
                     if (bookId == 0)
                     {
                         Console.WriteLine("Not Found");
                         try
                         {
-                            cmd = new SqlCommand("InsertBook", _conn);
+                            SqlCommand cmd = new SqlCommand("InsertBook", _conn);
                             cmd.CommandType = System.Data.CommandType.StoredProcedure;
                             cmd.Parameters.AddWithValue("@ISBN", book.ISBN);
                             cmd.Parameters.AddWithValue("@BookName", book.BookName);
@@ -207,6 +197,35 @@ namespace ReadRate.Controllers
                 Console.WriteLine(ex.Message);
             }
             return user;
+        }
+
+        public async Task<int> GetBookId(string ISBN)
+        {
+            int bookId = 0;
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("GetBookId", _conn);
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ISBN",ISBN);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        Console.WriteLine("Found");
+                        bookId = (int)dt.Rows[0]["BookId"];
+                    }                    
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return bookId;
         }
     }
 

@@ -144,26 +144,55 @@ namespace ReadRate.Controllers
         }
 
         [HttpPost, Route("[action]", Name = "CreateCommunity")]
-        public BookCommunity CreateCommunity(BookCommunity community)
+        public async Task<BookCommunity> CreateCommunity(CreateCommunity comm)
         {
-            BookCommunity comm = new BookCommunity();
+            BookCommunity community = new BookCommunity();
             try
             {
                 _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
                 _conn.Open();
+                Context.HttpContext.Session.SetInt32("UserId", 1);
+                int? userId = Context.HttpContext.Session.GetInt32("UserId");
+                int convertedUserId = userId.HasValue ? userId.Value : 0;
+                int bookId = await supplementaryController.GetBookId(comm.ISBN);
                 using (_conn)
                 {
-
+                    SqlCommand cmd = new SqlCommand("CraeteCommunity", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CommunityName", community.CommunityName);
+                    cmd.Parameters.AddWithValue("@CommunityDesc", community.CommunityDesc);
+                    cmd.Parameters.AddWithValue("@CommunityAdmin", convertedUserId);
+                    cmd.Parameters.AddWithValue("@BookId", bookId);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        Console.WriteLine("Found");
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            community.CommunityId = Convert.ToInt32(dr["CommunityId"]);
+                            community.CommunityName = dr["CommunityName"].ToString();
+                            community.CommunityDesc = dr["CommunityDesc"].ToString();
+                            community.CommunityAdmin = Convert.ToInt32(dr["CommunityAdmin"]);
+                            community.BookId = Convert.ToInt32(dr["BookId"]);
+                            community.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                            community.result = new Models.Results();
+                            community.result.result = true;
+                            community.result.message = "Created the community successfully";
+                        }
+                    }
                 }
             }
             catch (SqlException ex)
             {
-                comm.result = new Models.Results();
-                comm.result.result = false;
-                comm.result.message = ex.Message;
+                community.result = new Models.Results();
+                community.result.result = false;
+                community.result.message = ex.Message;
             }
-            return comm;
+            return community;
         }
+
 
 
 

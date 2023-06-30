@@ -8,6 +8,7 @@
         public int CommunityAdmin { get; set; }
         public int BookId { get; set; }
         public DateTime CreatedDate { get; set; }
+        public virtual int CommunityMembers { get; set; }
         public Result result { get; set; }
     }
 

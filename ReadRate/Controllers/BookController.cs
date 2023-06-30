@@ -1,14 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 using ReadRate.Models;
-using Microsoft.AspNetCore.Http;
-using System.Reflection.Metadata.Ecma335;
 using System.Data;
-using Newtonsoft.Json;
-using ReadRate.Controllers;
-using System.Linq.Expressions;
-using Newtonsoft.Json.Linq;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -59,6 +52,7 @@ namespace ReadRate.Controllers
                             community.CommunityDesc = dr["CommunityDesc"].ToString();
                             community.CommunityAdmin = Convert.ToInt32(dr["CommunityAdmin"]);
                             community.BookId = Convert.ToInt32(dr["BookId"]);
+                            community.CommunityMembers = await supplementaryController.NoOfCommMembers(community.CommunityId);
                             community.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
                             communities.Add(community);
                         }
@@ -86,7 +80,7 @@ namespace ReadRate.Controllers
         }
 
         [HttpGet, Route("[action]", Name = "UserCommunity")]
-        public List<BookCommunity> UserCommunityList()
+        public async Task<List<BookCommunity>> UserCommunityList()
         {
             List<BookCommunity> communities = new List<BookCommunity>();
             try
@@ -113,6 +107,7 @@ namespace ReadRate.Controllers
                             community.CommunityName = dr["CommunityName"].ToString();
                             community.CommunityDesc = dr["CommunityDesc"].ToString();
                             community.CommunityAdmin = Convert.ToInt32(dr["CommunityAdmin"]);
+                            community.CommunityMembers = await supplementaryController.NoOfCommMembers(community.CommunityId);
                             community.BookId = Convert.ToInt32(dr["BookId"]);
                             community.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
                             communities.Add(community);
@@ -163,10 +158,32 @@ namespace ReadRate.Controllers
                     cmd.Parameters.AddWithValue("@CommunityDesc", comm.CommunityDesc);
                     cmd.Parameters.AddWithValue("@CommunityAdmin", convertedUserId);
                     cmd.Parameters.AddWithValue("@BookId", bookId);
-                    cmd.ExecuteNonQuery();
-                    community.result = new Models.Result();
-                    community.result.result = true;
-                    community.result.message = "Community Created successfully";
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        Console.WriteLine("Found");
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            community.CommunityId = Convert.ToInt32(dr["CommunityId"]);
+                            community.CommunityName = dr["CommunityName"].ToString();
+                            community.CommunityDesc = dr["CommunityDesc"].ToString();
+                            community.CommunityAdmin = Convert.ToInt32(dr["CommunityAdmin"]);
+                            community.BookId = Convert.ToInt32(dr["BookId"]);
+                            community.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                            community.result = new Models.Result();
+                            community.result.result = true;
+                            community.result.message = "Community Created successfully";
+                        }
+                    }
+                    else
+                    {
+                        BookCommunity bookCommunity = new BookCommunity();
+                        bookCommunity.result = new Models.Result();
+                        bookCommunity.result.result = true;
+                        bookCommunity.result.message = "No community was created ";
+                    }
                 }
             }
             catch (SqlException ex)
@@ -190,6 +207,7 @@ namespace ReadRate.Controllers
                 {
                     SqlCommand cmd = new SqlCommand("DeleteCommunity", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
+                   // Context.HttpContext.Session.SetInt32("UserId", 1);
                     int? userId = Context.HttpContext.Session.GetInt32("UserId");
                     int convertedUserId = userId.HasValue ? userId.Value : 0;
                     cmd.Parameters.AddWithValue("@UserId", convertedUserId);
@@ -209,15 +227,42 @@ namespace ReadRate.Controllers
             return results;
         }
 
+        [HttpPost, Route("[action)", Name = "AddMember")]
+        public Result AddMember(int CommunityId)
+        {
+            Models.Result results = new Models.Result();
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("AddMember", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    //Context.HttpContext.Session.SetInt32("UserId", 1);
+                    int? userId = Context.HttpContext.Session.GetInt32("UserId");
+                    int convertedUserId = userId.HasValue ? userId.Value : 0;
+                    cmd.Parameters.AddWithValue("@UserId", convertedUserId);
+                    cmd.Parameters.AddWithValue("@CommunityId", CommunityId);
+                    cmd.ExecuteNonQuery();
+                    results.result = true;
+                    results.message = "You are added as a Member ";
+                }
+                _conn.Close();
+            }
+            catch (SqlException ex)
+            {
+                results.result = false;
+                results.message = ex.Message;
+                Console.WriteLine(ex.Message);
+            }
+            return results;
+        }
 
-        /*
 
 
-                    
 
-                   
-
-                    
+        /*                                   
 
                     [HttpPost, Route("[action]", Name = "")]
 

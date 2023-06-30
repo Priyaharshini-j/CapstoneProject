@@ -227,6 +227,37 @@ namespace ReadRate.Controllers
             }
             return bookId;
         }
+
+        public async Task<int> NoCommMembers(int CommunityId)
+        {
+            int memberCount = 0;
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("GetCommunityMembersCount", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CommunityId", CommunityId);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        foreach(DataRow row in dt.Rows)
+                        {
+                            memberCount++;
+                        }
+                    }
+                }
+            } 
+            catch (Exception ex)
+            {
+                memberCount = 0;
+            }
+            return memberCount;
+          }
     }
 
 }

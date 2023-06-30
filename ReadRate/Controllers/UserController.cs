@@ -16,9 +16,11 @@ namespace ReadRate.Controllers
         SqlConnection conn;
         private readonly IConfiguration _configuration;
         IHttpContextAccessor Context;
-        public UserController(IConfiguration configuration, IHttpContextAccessor context)
+        SupplementaryController supplementaryController;
+        public UserController(IConfiguration configuration, IHttpContextAccessor context , SupplementaryController _supplementaryController)
         {
             _configuration = configuration;
+            supplementaryController = _supplementaryController;
             Context = context;
         }
 
@@ -165,9 +167,11 @@ namespace ReadRate.Controllers
         }
 
         [HttpDelete, Route("[action]", Name = "DeleteProfile")]
-        public Models.Results DeleteProfile(int UserId)
+        public Models.Results DeleteProfile()
         {
             Models.Results result = new Models.Results();
+            int? convertedUserID = Context.HttpContext.Session.GetInt32("UserId");
+            int UserId = convertedUserID.HasValue ? convertedUserID.Value : 0;
             try
             {
                 conn = new SqlConnection(_configuration["ConnectionStrings:SqlConn"]);

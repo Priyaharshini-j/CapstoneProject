@@ -143,6 +143,27 @@ namespace ReadRate.Controllers
             return communities;
         }
 
+        [HttpPost, Route("[action]", Name = "CreateCommunity")]
+        public BookCommunity CreateCommunity(BookCommunity community)
+        {
+            BookCommunity comm = new BookCommunity();
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+
+                }
+            }
+            catch (SqlException ex)
+            {
+                comm.result = new Models.Results();
+                comm.result.result = false;
+                comm.result.message = ex.Message;
+            }
+            return comm;
+        }
 
 
 
@@ -151,7 +172,7 @@ namespace ReadRate.Controllers
 
                     
 
-                    [HttpPost, Route("[action]", Name = "")]
+                   
 
                     [HttpPost, Route("[action]", Name = "")]
 

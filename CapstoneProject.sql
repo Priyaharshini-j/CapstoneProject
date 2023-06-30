@@ -10,7 +10,6 @@ CREATE TABLE Users (
   CreatedDate DATETIME DEFAULT GETDATE()
 );
 
-
 --For checking functionality I am entering the data manually
 -- Inserting sample data into the Users table
 INSERT INTO Users ( UserName, UserEmail, Password, SecurityQn, SecurityAns, CreatedDate)
@@ -19,46 +18,6 @@ VALUES
   ('Jane Smith', 'jane.smith@example.com', 'abc123', 'What is your pet name?', 'Max', GETDATE()),
   ('David Johnson', 'david.johnson@example.com', 'qwerty', 'What city were you born in?', 'New York', GETDATE());
 
---Creating the procedure to check the User credentials
-CREATE OR ALTER PROCEDURE ValidateLogin
-@UserEmail Varchar(50),
-@UserPassword VARCHAR(25)
-AS
-BEGIN 
-SELECT * FROM Users WHERE UserEmail = @UserEmail AND Password = @UserPassword;
-END;
-
---Creating the procedure to Creating a user profile
-CREATE OR ALTER PROCEDURE CreateUser
-@UserName VARCHAR(25),
-@UserEmail VARCHAR(50),
-@Password VARCHAR(25),
-@SecurityQn VARCHAR(225),
-@SecurityAns VARCHAR(225)
-AS
-BEGIN
-INSERT INTO USERS 
-VALUES (@UserName, @UserEmail, @Password,@SecurityQn, @SecurityQn,GETDATE());
-END
-
---Creating Procedure to update the profile
-CREATE OR ALTER PROCEDURE UpdateUser
-@UserId INT,
-@Password VARCHAR(25),
-@SecurityQn VARCHAR(225),
-@SecurityAns VARCHAR(225)
-AS
-BEGIN
-UPDATE Users SET Password =@Password , SecurityQn = @SecurityQn, SecurityAns = @SecurityAns WHERE UserId= @UserId;
-END;
-
---Creating Procedure to Delete User Profile
-CREATE OR ALTER PROCEDURE UpdateUser
-@UserId INT
-AS
-BEGIN 
-DELETE FROM Users WHERE UserId = @UserId;
-END;
 
 --CREATING THE DATABASE FOR BOOK
 CREATE TABLE Book
@@ -75,13 +34,6 @@ Publisher VARCHAR(200),
 PublishedDate DATETIME
 );
 
-CREATE OR ALTER PROCEDURE GetBookId
-@ISBN VARCHAR(50)
-AS
-BEGIN
-SELECT * FROM Book WHERE ISBN=@ISBN;
-END;
-
 SELECT * FROM Book
 --CREATING THE TABLE FOR COMMUNITY
 CREATE TABLE Community
@@ -96,51 +48,6 @@ CONSTRAINT [Fk_UserId] FOREIGN KEY (CommunityAdmin) REFERENCES Users(UserId),
 CONSTRAINT [Fk_BookId] FOREIGN KEY (BookId) REFERENCES Book(BookId),
 );
 
---Creating procedure for retriving bookID
-CREATE OR ALTER PROCEDURE GetBookId
-@ISBN VARCHAR(50)
-AS
-BEGIN
-SELECT * FROM dbo.Book WHERE ISBN = @ISBN;
-END;
-
---Creating procdure for inserting and returning book id
-CREATE OR ALTER PROCEDURE InsertBook
-    @ISBN VARCHAR(50),
-    @BookName VARCHAR(225),
-    @BookVol VARCHAR(50),
-    @Genre VARCHAR(MAX),
-    @Author VARCHAR(100),
-    @CoverUrl VARCHAR(MAX),
-    @bookDesc VARCHAR(MAX),
-    @Publisher VARCHAR(200),
-    @PublishedDate DATETIME,
-    @BookId INT OUTPUT
-AS
-BEGIN
-    INSERT INTO Book (ISBN, BookName, BookVol, Genre, Author, CoverUrl, BookDesc, Publisher, PublishedDate)
-    VALUES (@ISBN, @BookName, @BookVol, @Genre, @Author, @CoverUrl, @bookDesc, @Publisher, @PublishedDate)
-END;
-
-
-
---Creating the procedure to retrive the community by BookId
-
-CREATE OR ALTER PROCEDURE GetCommunityBookId
-@BookId INT
-AS
-BEGIN
-SELECT * FROM Community WHERE BookId=@BookId;
-END;
-
-CREATE OR ALTER PROCEDURE GetCommunityByUserId
-@UserID INT
-AS
-BEGIN
-SELECT * FROM Community WHERE CommunityAdmin = @UserID;
-END;
-
-
 --CREATING TABLE FOR Post
 CREATE TABLE Post
 (
@@ -154,26 +61,6 @@ CONSTRAINT [Fk_Post_UserId] FOREIGN KEY (UserId) REFERENCES Users(UserId),
 CONSTRAINT [Fk_Post_BookId] FOREIGN KEY (BookId) REFERENCES Book(BookId),
 );
 
---creating the procedure to retrive the post based on the bookId
-CREATE OR ALTER PROCEDURE GetPostByBookId
-@BookId INT
-AS
-BEGIN
-SELECT * FROM Post WHERE BookId= @BookId;
-END;
-
---Creating the procedure for retreiving the post created ny the users
-CREATE OR ALTER PROCEDURE GetUsersPost
-@UserId INT
-AS
-BEGIN
-SELECT * FROM Post WHERE UserId= @UserId;
-END;
-
-
-
-
-
 --Creating the table for Critic
 CREATE TABLE Critique
 (
@@ -186,18 +73,6 @@ CONSTRAINT [Fk_Critique_UserId] FOREIGN KEY (UserId) REFERENCES Users(UserId),
 CONSTRAINT [Fk_Critique_BookId] FOREIGN KEY (BookId) REFERENCES Book(BookId),
 );
 
---Get Critique by bookID
-CREATE OR ALTER PROCEDURE GetCritiqueByBookId
-@BookId INT
-AS
-BEGIN
-SELECT * FROM Critique WHERE BookId = @BookId;
-END;
-
-
-
-
-
 --CREATING TABLE FOR Rating 
 CREATE TABLE Rating
 (
@@ -209,17 +84,6 @@ CreatedDate DATE DEFAULT SYSDATETIME(),
 CONSTRAINT [Fk_Rating_UserId] FOREIGN KEY (UserId) REFERENCES Users(UserId),
 CONSTRAINT [Fk_Rating_BookId] FOREIGN KEY (BookId) REFERENCES Book(BookId),
 );
-
---creating procedure for the rating retrival based on bookId
-CREATE OR ALTER PROCEDURE getRatingsByBookId
-@BookId INT
-AS
-BEGIN
-SELECT * FROM Rating WHERE BookId= @BookId;
-END;
-
-
-
 
 --CREATING TABLE FOR BookShelves
 CREATE TABLE BookShelf
@@ -245,7 +109,6 @@ CreatedDate DATETIME DEFAULT SYSDATETIME(),
 CONSTRAINT [Fk_CommMember_CommId] FOREIGN KEY (CommunityId) REFERENCES Community(CommunityId),
 CONSTRAINT [Fk_CommMember_UserId] FOREIGN KEY (UserId) REFERENCES Users(UserId)
 );
-
 
 --Creating table for the CommunityDiscussion
 CREATE TABLE CommunityDiscussion
@@ -283,7 +146,6 @@ CONSTRAINT [Fk_PostLike_UserId] FOREIGN KEY (UserId) REFERENCES Users(UserId),
 CONSTRAINT [Fk_PostId] FOREIGN KEY (PostId) REFERENCES Post(PostId),
 );
 
-
 --CREATING TABLE FOR THE REPLIES FOR THE CRITIQUE
 CREATE TABLE CritiqueReply
 (
@@ -302,7 +164,7 @@ CREATE TABLE CritiqueLike
 CritiqueLikeId INT IDENTITY(1,1) PRIMARY KEY,
 CritiqueId INT NOT NULL,
 UserId INT NOT NULL,
-LikeStatus BIT,
+LikeStatus INT,
 CreatedDate DATETIME DEFAULT SYSDATETIME(),
 CONSTRAINT [Fk_CritiqueLike_CritiqueId] FOREIGN KEY (CritiqueId) REFERENCES Critique(CritiqueId),
 CONSTRAINT [Fk_CritiqueLike_UserId] FOREIGN KEY (UserId) REFERENCES Users(UserId)
@@ -318,9 +180,6 @@ CreatedDate DATE DEFAULT SYSDATETIME(),
 CONSTRAINT [Fk_Following_FollowerId] FOREIGN KEY (UserId) REFERENCES Users(UserId),
 CONSTRAINT [Fk_Following_FollowingId] FOREIGN KEY (FollowingUserId) REFERENCES Users(UserId),
 );
-
-
-
 
 --Community->CommunityMembers->CommunityDiscussion->DiscussionReply
 --Critic->CritiqueReply
@@ -342,19 +201,6 @@ SELECT * FROM Book
 SELECT * FROM Users
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 DROP TABLE PostLike;
 DROP TABLE Post
 DROP TABLE CritiqueLike
@@ -367,7 +213,3 @@ DROP TABLE CommunityDiscussion
 DROP TABLE CommunityMembers
 DROP TABLE Community
 DROP TABLE Book
-DROP TABLE
-DROP TABLE
-DROP TABLE
-DROP TABLE

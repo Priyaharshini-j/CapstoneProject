@@ -118,6 +118,96 @@ namespace ReadRate.Controllers
             }
             return book;
         } 
+
+        public int[] getCritqueLikeByCritiqieId(int critqueId)
+        {
+
+            int[] critiqueLike = new int[2];
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("CritiqueLikeDislike", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CritiqueId", critqueId);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            int likeStatus = Convert.ToInt32(dr["LikeStatus"]);
+
+                            if (likeStatus == -1)
+                            {
+                                critiqueLike[0] = critiqueLike[0] + 1;
+                            }
+                            else if (likeStatus == 1)
+                            {
+                                critiqueLike[1] = critiqueLike[1] + 1;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        critiqueLike[0] = 0;
+                        critiqueLike[1] = 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return critiqueLike;
+        }
+
+        public UserModel GetUser(int UserId)
+        {
+            UserModel user = new UserModel();
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("GetUserById", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@UserId", UserId);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            user.UserId = Convert.ToInt32(dr["UserId"]);
+                            user.UserName = dr["UserName"].ToString();
+                            user.UserEmail = dr["UserEmail"].ToString();
+                            user.Password = dr["Password"].ToString();
+                            user.SecurityQn = dr["SecurityQn"].ToString();
+                            user.SecurityAns = dr["SecurityAns"].ToString();
+                            user.result = new Models.Results();
+                            user.result.result = true;
+                            user.result.message = "User Details are retrieved";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                user.result = new Models.Results();
+                user.result.result = false;
+                user.result.message = ex.Message;
+                Console.WriteLine(ex.Message);
+            }
+            return user;
+        }
     }
 
 }

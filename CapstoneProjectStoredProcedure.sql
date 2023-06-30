@@ -133,11 +133,52 @@ END;
 
 --Procedure to create comm
 CREATE OR ALTER PROCEDURE CreateCommunity
-@CommunityName VARCHAR(225),
-@CommunityDesc VARCHAR(MAX),
-@CommunityAdmin INT,
-@BookId INT
+    @CommunityName VARCHAR(225),
+    @CommunityDesc VARCHAR(MAX),
+    @CommunityAdmin INT,
+    @BookId INT,
+    @CommunityId INT OUTPUT
 AS
 BEGIN
-INSERT INTO Community VALUES (@CommunityName,@CommunityDesc,@CommunityAdmin,@BookId, GETDATE());
+    INSERT INTO Community
+    VALUES (@CommunityName, @CommunityDesc, @CommunityAdmin, @BookId, GETDATE());
+
+    SET @CommunityId = SCOPE_IDENTITY();
+
+    SELECT
+        @CommunityId AS CommunityId,
+        @CommunityName AS CommunityName,
+        @CommunityDesc AS CommunityDesc,
+        @CommunityAdmin AS CommunityAdmin,
+        @BookId AS BookId,
+        GETDATE() AS CreatedDate;
+        
+    INSERT INTO CommunityMembers
+    VALUES (@CommunityId, @CommunityAdmin, GETDATE());
+END;
+
+--Procedure to delte community
+CREATE OR ALTER PROCEDURE DeleteCommunity
+@CommunityId INT,
+@UserId INT
+AS
+BEGIN
+DELETE FROM CommunityMembers WHERE CommunityId = @CommunityId;
+DELETE FROM Community WHERE CommunityId = @CommunityId AND CommunityAdmin = @UserId;
+END;
+
+CREATE OR ALTER PROCEDURE AddMember
+@UserId INT,
+@CommunityId INT
+AS
+BEGIN
+INSERT INTO CommunityMembers VALUES (@CommunityId, @UserId, GETDATE());
+END;
+
+--Procedure to count members in community
+CREATE OR ALTER PROCEDURE GetCommunityMembersCount
+@CommunityId INT
+AS
+BEGIN
+SELECT * FROM CommunityMembers WHERE CommunityId = @CommunityId;
 END;

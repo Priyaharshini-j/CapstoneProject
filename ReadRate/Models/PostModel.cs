@@ -8,6 +8,6 @@
         public int BookId { get; set; }
         public byte[] Picture { get; set; }
         public DateTime CreatedDate { get; set; }
-        public virtual Results result { get; set; }
+        public virtual Result result { get; set; }
     }
 }

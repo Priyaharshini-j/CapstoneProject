@@ -57,7 +57,7 @@ namespace ReadRate.Controllers
                     else
                     {
                         CritiqueModel critique = new CritiqueModel();
-                        critique.result = new Models.Results();
+                        critique.result = new Models.Result();
                         critique.result.result = true;
                         critique.result.message = "No Critique found for this book";
                         critiques.Add(critique);
@@ -68,7 +68,7 @@ namespace ReadRate.Controllers
             catch (SqlException ex)
             {
                 CritiqueModel critique = new CritiqueModel();
-                critique.result = new Models.Results();
+                critique.result = new Models.Result();
                 critique.result.result = false;
                 critique.result.message = ex.Message;
                 critiques.Add(critique);
@@ -115,7 +115,7 @@ namespace ReadRate.Controllers
                     else
                     {
                         UserCritique critique = new UserCritique();
-                        critique.result = new Models.Results();
+                        critique.result = new Models.Result();
                         critique.result.result = true;
                         critique.result.message = "No Critique found for this book";
                         critiqueList.Add(critique);
@@ -127,7 +127,7 @@ namespace ReadRate.Controllers
             catch (SqlException ex)
             {
                 UserCritique critique = new UserCritique();
-                critique.result = new Models.Results();
+                critique.result = new Models.Result();
                 critique.result.result = false;
                 critique.result.message = ex.Message;
                 critiqueList.Add(critique);

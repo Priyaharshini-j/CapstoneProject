@@ -17,7 +17,7 @@ namespace ReadRate.Models
         public string Password { get; set; }
         public string SecurityQn { get; set; }
         public string SecurityAns { get; set; }
-        public Results result { get; set; }
+        public Result result { get; set; }
 
     }
 

@@ -66,7 +66,7 @@ namespace ReadRate.Controllers
                     else
                     {
                         BookCommunity comm = new BookCommunity();
-                        comm.result = new Models.Results();
+                        comm.result = new Models.Result();
                         comm.result.result = true;
                         comm.result.message = "No Communities found";
                         communities.Add(comm);
@@ -77,7 +77,7 @@ namespace ReadRate.Controllers
             catch (SqlException ex)
             {
                 BookCommunity comm = new BookCommunity();
-                comm.result = new Models.Results();
+                comm.result = new Models.Result();
                 comm.result.result = false;
                 comm.result.message =ex.Message;
                 communities.Add(comm);
@@ -122,7 +122,7 @@ namespace ReadRate.Controllers
                     else
                     {
                         BookCommunity bookCommunity = new BookCommunity();
-                        bookCommunity.result = new Models.Results();
+                        bookCommunity.result = new Models.Result();
                         bookCommunity.result.result = false;
                         bookCommunity.result.message = "No community was created by the User";
                         communities.Add(bookCommunity);
@@ -133,7 +133,7 @@ namespace ReadRate.Controllers
             catch (SqlException ex)
             {
                 BookCommunity bookCommunity = new BookCommunity();
-                bookCommunity.result = new Models.Results();
+                bookCommunity.result = new Models.Result();
                 bookCommunity.result.result = false;
                 bookCommunity.result.message = ex.Message;
                 communities.Add(bookCommunity);
@@ -151,49 +151,63 @@ namespace ReadRate.Controllers
             {
                 _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
                 _conn.Open();
-                Context.HttpContext.Session.SetInt32("UserId", 1);
+                
                 int? userId = Context.HttpContext.Session.GetInt32("UserId");
                 int convertedUserId = userId.HasValue ? userId.Value : 0;
                 int bookId = await supplementaryController.GetBookId(comm.ISBN);
                 using (_conn)
                 {
-                    SqlCommand cmd = new SqlCommand("CraeteCommunity", _conn);
+                    SqlCommand cmd = new SqlCommand("CreateCommunity", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@CommunityName", community.CommunityName);
-                    cmd.Parameters.AddWithValue("@CommunityDesc", community.CommunityDesc);
+                    cmd.Parameters.AddWithValue("@CommunityName", comm.CommunityName);
+                    cmd.Parameters.AddWithValue("@CommunityDesc", comm.CommunityDesc);
                     cmd.Parameters.AddWithValue("@CommunityAdmin", convertedUserId);
                     cmd.Parameters.AddWithValue("@BookId", bookId);
-                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-                    if (dt != null && dt.Rows.Count > 0)
-                    {
-                        Console.WriteLine("Found");
-                        foreach (DataRow dr in dt.Rows)
-                        {
-                            community.CommunityId = Convert.ToInt32(dr["CommunityId"]);
-                            community.CommunityName = dr["CommunityName"].ToString();
-                            community.CommunityDesc = dr["CommunityDesc"].ToString();
-                            community.CommunityAdmin = Convert.ToInt32(dr["CommunityAdmin"]);
-                            community.BookId = Convert.ToInt32(dr["BookId"]);
-                            community.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
-                            community.result = new Models.Results();
-                            community.result.result = true;
-                            community.result.message = "Created the community successfully";
-                        }
-                    }
+                    cmd.ExecuteNonQuery();
+                    community.result = new Models.Result();
+                    community.result.result = true;
+                    community.result.message = "Community Created successfully";
                 }
             }
             catch (SqlException ex)
             {
-                community.result = new Models.Results();
+                community.result = new Models.Result();
                 community.result.result = false;
                 community.result.message = ex.Message;
             }
             return community;
         }
 
-
+        [HttpDelete, Route("[action]", Name = "DeleteCommunity")]
+        public Models.Result DeleteCommunity(int CommunityId)
+        {
+            Models.Result results = new Models.Result();
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("DeleteCommunity", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    int? userId = Context.HttpContext.Session.GetInt32("UserId");
+                    int convertedUserId = userId.HasValue ? userId.Value : 0;
+                    cmd.Parameters.AddWithValue("@UserId", convertedUserId);
+                    cmd.Parameters.AddWithValue("@CommunityId", CommunityId);
+                    cmd.ExecuteNonQuery();
+                    results.result = true;
+                    results.message = "Community Was deleted successfully";
+                }
+                _conn.Close();
+            }
+            catch(SqlException ex)
+            {
+                results.result = false;
+                results.message = ex.Message;
+                Console.WriteLine(ex.Message);
+            }
+            return results;
+        }
 
 
         /*
@@ -203,7 +217,7 @@ namespace ReadRate.Controllers
 
                    
 
-                    [HttpPost, Route("[action]", Name = "")]
+                    
 
                     [HttpPost, Route("[action]", Name = "")]
 

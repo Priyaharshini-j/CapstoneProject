@@ -7,7 +7,7 @@
         public int UserId { get; set; }
         public int Rating { get; set; }
         public DateTime CreatedDate { get; set; }
-        public  virtual Results result { get; set; }
+        public  virtual Result result { get; set; }
     }
 
     public class UserRatingModel

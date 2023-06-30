@@ -28,7 +28,7 @@ namespace ReadRate.Controllers
         public UserModel Login(UserLogin user)
         {
             UserModel userModel = new UserModel();
-            userModel.result = new Models.Results();
+            userModel.result = new Models.Result();
             try
             {
                 if (user != null && !string.IsNullOrWhiteSpace(user.UserEmail) && !string.IsNullOrWhiteSpace(user.Password))
@@ -81,9 +81,9 @@ namespace ReadRate.Controllers
             return userModel;
         }
         [HttpPost, Route("[action]", Name = "SignUp")]
-        public Models.Results SignUp(UserModel userModel)
+        public Models.Result SignUp(UserModel userModel)
         {
-            Models.Results result = new Models.Results();
+            Models.Result result = new Models.Result();
             try
             {
                 conn = new SqlConnection(_configuration["ConnectionStrings:SqlConn"]);
@@ -123,9 +123,9 @@ namespace ReadRate.Controllers
         }
 
         [HttpPut, Route("[action]", Name = "EditProfile")]
-        public Models.Results UpdateProfile(UserModel userModel)
+        public Models.Result UpdateProfile(UserModel userModel)
         {
-            Models.Results result = new Models.Results();
+            Models.Result result = new Models.Result();
             try
             {
                 if (userModel.UserName != null && userModel.UserEmail != null && userModel.Password != null && userModel.SecurityAns != null && userModel.SecurityQn != null)
@@ -167,9 +167,9 @@ namespace ReadRate.Controllers
         }
 
         [HttpDelete, Route("[action]", Name = "DeleteProfile")]
-        public Models.Results DeleteProfile()
+        public Models.Result DeleteProfile()
         {
-            Models.Results result = new Models.Results();
+            Models.Result result = new Models.Result();
             int? convertedUserID = Context.HttpContext.Session.GetInt32("UserId");
             int UserId = convertedUserID.HasValue ? convertedUserID.Value : 0;
             try

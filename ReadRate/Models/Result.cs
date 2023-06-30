@@ -1,6 +1,6 @@
 ﻿namespace ReadRate.Models
 {
-    public class Results
+    public class Result
     {
         public bool result { get; set; }
         public string message { get; set; }

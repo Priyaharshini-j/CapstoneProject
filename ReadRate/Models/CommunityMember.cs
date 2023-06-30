@@ -7,6 +7,6 @@
         public int UserId { get; set; }
         public DateTime CreatedDate { get; set; }
         public virtual UserModel User { get; set; }
-        public Results result { get; set; }
+        public Result result { get; set; }
     }
 }

@@ -93,7 +93,7 @@ namespace ReadRate.Controllers
                     }
                     else
                     {
-                        book.result = new Models.Results();
+                        book.result = new Models.Result();
                         book.result.result = true;
                         book.result.message = "Unable to fetch the Book Details";
                     }
@@ -101,7 +101,7 @@ namespace ReadRate.Controllers
             }
             catch (Exception ex)
             {
-                book.result = new Models.Results();
+                book.result = new Models.Result();
                 book.result.result = false;
                 book.result.message = ex.Message;
                 Console.WriteLine(ex.Message);
@@ -182,7 +182,7 @@ namespace ReadRate.Controllers
                             user.Password = dr["Password"].ToString();
                             user.SecurityQn = dr["SecurityQn"].ToString();
                             user.SecurityAns = dr["SecurityAns"].ToString();
-                            user.result = new Models.Results();
+                            user.result = new Models.Result();
                             user.result.result = true;
                             user.result.message = "User Details are retrieved";
                         }
@@ -191,7 +191,7 @@ namespace ReadRate.Controllers
             }
             catch (Exception ex)
             {
-                user.result = new Models.Results();
+                user.result = new Models.Result();
                 user.result.result = false;
                 user.result.message = ex.Message;
                 Console.WriteLine(ex.Message);

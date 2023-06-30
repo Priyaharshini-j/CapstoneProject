@@ -8,7 +8,7 @@
         public int CommunityAdmin { get; set; }
         public int BookId { get; set; }
         public DateTime CreatedDate { get; set; }
-        public Results result { get; set; }
+        public Result result { get; set; }
     }
 
     public class CreateCommunity

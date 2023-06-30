@@ -7,6 +7,6 @@
         public int CommunityMemberId { get; set; }
         public string Discussion { get; set; }
         public DateTime CreatedDate { get; set; }
-        public Results result { get; set; }
+        public Result result { get; set; }
     }
 }

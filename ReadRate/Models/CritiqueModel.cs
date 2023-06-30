@@ -8,7 +8,7 @@
         public string CritiqueDesc { get; set; }
         public DateTime CreatedDate { get; set; }
         public virtual CritiqueLike Likes { get; set; }
-        public Results result { get; set; }
+        public Result result { get; set; }
     }
 
     public class UserCritique
@@ -20,6 +20,6 @@
         public DateTime CreatedDate { get; set; }
         public int Like { get; set; }
         public int Dislike { get; set; }
-        public Results result { get; set; }
+        public Result result { get; set; }
     }
 }

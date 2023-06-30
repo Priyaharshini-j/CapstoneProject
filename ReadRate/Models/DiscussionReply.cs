@@ -8,6 +8,6 @@
         public string Reply { get; set; }
         public DateTime CreatedDate { get; set; }
         public virtual CommunityDiscussion CommunityDiscussion { get; set;}
-        public Results result { get; set; }
+        public Result result { get; set; }
     }
 }

@@ -56,7 +56,7 @@ namespace ReadRate.Controllers
                     else
                     {
                         PostModel post = new PostModel();
-                        post.result = new Models.Results();
+                        post.result = new Models.Result();
                         post.result.result = true;
                         post.result.message = "No Post found for this book";
                         postList.Add(post);
@@ -67,7 +67,7 @@ namespace ReadRate.Controllers
             catch (Exception ex)
             {
                 PostModel post = new PostModel();
-                post.result = new Models.Results();
+                post.result = new Models.Result();
                 post.result.result = false;
                 post.result.message = ex.Message;
                 postList.Add(post);
@@ -111,7 +111,7 @@ namespace ReadRate.Controllers
                     else
                     {
                         PostModel post = new PostModel();
-                        post.result = new Models.Results();
+                        post.result = new Models.Result();
                         post.result.result = true;
                         post.result.message = "No Post found for this book";
                         UserPosts.Add(post);
@@ -122,7 +122,7 @@ namespace ReadRate.Controllers
             catch (Exception ex)
             {
                 PostModel post = new PostModel();
-                post.result = new Models.Results();
+                post.result = new Models.Result();
                 post.result.result = false;
                 post.result.message = ex.Message;
                 UserPosts.Add(post);

@@ -13,7 +13,7 @@
         public string Publisher { get; set; }
         public string PublishedDate { get; set; }
         public virtual RatingModel Rating { get; set; }
-        public Results result { get; set; }
+        public Result result { get; set; }
 
     }
 

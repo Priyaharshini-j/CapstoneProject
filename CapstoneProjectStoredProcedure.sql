@@ -7,6 +7,16 @@ BEGIN
 SELECT * FROM Users WHERE UserEmail = @UserEmail AND Password = @UserPassword;
 END;
 
+--Procedure for retrieving the user by id
+CREATE OR ALTER PROCEDURE GetUserById
+@UserId INT
+AS
+BEGIN
+SELECT * FROM Users WHERE UserId=@UserId;
+END;
+
+
+
 --Creating the procedure to Creating a user profile
 CREATE OR ALTER PROCEDURE CreateUser
 @UserName VARCHAR(25),

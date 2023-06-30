@@ -131,3 +131,13 @@ BEGIN
 SELECT * FROM Rating WHERE BookId= @BookId;
 END;
 
+--Procedure to create comm
+CREATE OR ALTER PROCEDURE CreateCommunity
+@CommunityName VARCHAR(225),
+@CommunityDesc VARCHAR(MAX),
+@CommunityAdmin INT,
+@BookId INT
+AS
+BEGIN
+INSERT INTO Community VALUES (@CommunityName,@CommunityDesc,@CommunityAdmin,@BookId, GETDATE());
+END;

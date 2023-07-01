@@ -235,6 +235,7 @@ CREATE OR ALTER PROCEDURE PostLikeDislike
 AS
 BEGIN
 INSERT INTO PostLike VALUES (@PostId,@UserId,@LikeStatus,GETDATE());
+SET @PostId = SCOPE_IDENTITY();
 END;
 
 
@@ -276,6 +277,25 @@ BEGIN
 INSERT INTO Post VALUES (@PostCaption, @UserId, @BookId, @Picture, GETDATE());
 END;
 
+CREATE OR ALTER PROCEDURE CreateCritique
+@BookId INT,
+@UserId INT,
+@CritiqueDesc VARCHAR(MAX),
+@CritiqueId INT OUTPUT
+AS
+BEGIN
+INSERT INTO Critique VALUES (@BookId,@UserId ,@CritiqueDesc,GETDATE());
+SET @CritiqueId = SCOPE_IDENTITY();
+SELECT * FROM Critique WHERE CritiqueId=@CritiqueId;
+END;
+
+CREATE OR ALTER PROCEDURE DeleteCritique
+@CritiqueId INT,
+@UserId INT
+AS
+BEGIN
+DELETE FROM Critique WHERE CritiqueId= @CritiqueId AND UserId = @UserId;
+END;
 
 SELECT * FROM PostLike
-SELECT * FROM BookShelf
+SELECT * FROM Critique

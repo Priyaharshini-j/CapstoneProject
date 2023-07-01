@@ -266,5 +266,16 @@ BEGIN
 UPDATE Community SET CommunityName=@CommunityName, CommunityDesc=@CommunityDesc WHERE CommunityId=@CommunityId AND BookId=@BookId AND CommunityAdmin=@CommunityAdmin;
 END;
 
+CREATE OR ALTER PROCEDURE CreatePost
+@PostCaption VARCHAR(225),
+@BookId INT,
+@Picture VARBINARY(MAX),
+@UserId INT
+AS
+BEGIN
+INSERT INTO Post VALUES (@PostCaption, @UserId, @BookId, @Picture, GETDATE());
+END;
+
+
 SELECT * FROM PostLike
 SELECT * FROM BookShelf

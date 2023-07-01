@@ -165,5 +165,36 @@ namespace ReadRate.Controllers
             }
             return result;
         }
+
+        [HttpPost, Route("[action]", Name = "CreatePost")]
+        public Result CreatePost(PostModel post)
+        {
+            int? UserId = Context.HttpContext.Session.GetInt32("UserId");
+            Result result = new Result();
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                int? userId = Context.HttpContext.Session.GetInt32("UserId");
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("CreatePost", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@PostCaption", post.PostCaption);
+                    cmd.Parameters.AddWithValue("@BookId", post.BookId);
+                    cmd.Parameters.AddWithValue("@Picture", post.Picture);
+                    cmd.Parameters.AddWithValue("@UserId", UserId);
+                    cmd.ExecuteNonQuery();
+                    result.result = true;
+                    result.message = "Successfully Posted a Picture";
+                }
+            }
+            catch(Exception ex)
+            {
+                result.result = false;
+                result.message = ex.Message;
+            }
+            return result;
+        }
     }
 }

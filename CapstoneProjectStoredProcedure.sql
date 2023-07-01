@@ -182,3 +182,17 @@ AS
 BEGIN
 SELECT * FROM CommunityMembers WHERE CommunityId = @CommunityId;
 END;
+
+SELECT * FROM Rating
+
+--Procedure to create comm
+CREATE OR ALTER PROCEDURE AddRating
+	@userRatings INT,
+	@UserId INT,
+	@BookId INT
+AS
+BEGIN
+    INSERT INTO Rating
+    VALUES (@BookId, @UserId, @userRatings, GETDATE());
+    SELECT * FROM Book WHERE BookId = @BookId;
+END;

@@ -52,7 +52,7 @@ namespace ReadRate.Controllers
                             community.CommunityDesc = dr["CommunityDesc"].ToString();
                             community.CommunityAdmin = Convert.ToInt32(dr["CommunityAdmin"]);
                             community.BookId = Convert.ToInt32(dr["BookId"]);
-                            community.CommunityMembers = await supplementaryController.NoOfCommMembers(community.CommunityId);
+                            community.CommunityMembers = supplementaryController.NoOfCommMembers(community.CommunityId);
                             community.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
                             communities.Add(community);
                         }
@@ -80,7 +80,7 @@ namespace ReadRate.Controllers
         }
 
         [HttpGet, Route("[action]", Name = "UserCommunity")]
-        public async Task<List<BookCommunity>> UserCommunityList()
+        public List<BookCommunity> UserCommunityList()
         {
             List<BookCommunity> communities = new List<BookCommunity>();
             try
@@ -107,11 +107,10 @@ namespace ReadRate.Controllers
                             community.CommunityName = dr["CommunityName"].ToString();
                             community.CommunityDesc = dr["CommunityDesc"].ToString();
                             community.CommunityAdmin = Convert.ToInt32(dr["CommunityAdmin"]);
-                            community.CommunityMembers = await supplementaryController.NoOfCommMembers(community.CommunityId);
+                            community.CommunityMembers = supplementaryController.NoOfCommMembers(community.CommunityId);
                             community.BookId = Convert.ToInt32(dr["BookId"]);
                             community.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
                             communities.Add(community);
-
                         }
                     }
                     else
@@ -139,7 +138,7 @@ namespace ReadRate.Controllers
         }
 
         [HttpPost, Route("[action]", Name = "CreateCommunity")]
-        public async Task<BookCommunity> CreateCommunity(CreateCommunity comm)
+        public BookCommunity CreateCommunity(CreateCommunity comm)
         {
             BookCommunity community = new BookCommunity();
             try
@@ -149,7 +148,7 @@ namespace ReadRate.Controllers
                 
                 int? userId = Context.HttpContext.Session.GetInt32("UserId");
                 int convertedUserId = userId.HasValue ? userId.Value : 0;
-                int bookId = await supplementaryController.GetBookId(comm.ISBN);
+                int bookId =  supplementaryController.GetBookId(comm.ISBN);
                 using (_conn)
                 {
                     SqlCommand cmd = new SqlCommand("CreateCommunity", _conn);
@@ -227,7 +226,8 @@ namespace ReadRate.Controllers
             return results;
         }
 
-        [HttpPost, Route("[action)", Name = "AddMember")]
+        [HttpPost, Route("[action]", Name = "AddMember")]
+
         public Result AddMember(int CommunityId)
         {
             Models.Result results = new Models.Result();

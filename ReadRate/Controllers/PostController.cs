@@ -131,5 +131,7 @@ namespace ReadRate.Controllers
             _conn.Close();
             return UserPosts;
         }
+
+        []
     }
 }

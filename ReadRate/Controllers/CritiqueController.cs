@@ -16,7 +16,7 @@ namespace ReadRate.Controllers
         private readonly IConfiguration configuration;
         IHttpContextAccessor Context;
         HttpClient client = new HttpClient();
-        public CritiqueController(IConfiguration _configuration, HttpContextAccessor _context , SupplementaryController _controller)
+        public CritiqueController(IConfiguration _configuration, IHttpContextAccessor _context , SupplementaryController _controller)
         {
             supplementaryController = _controller;
             configuration = _configuration;
@@ -90,7 +90,6 @@ namespace ReadRate.Controllers
                 {
                     SqlCommand cmd = new SqlCommand("GetUsersCritique", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    Context.HttpContext.Session.SetInt32("UserId", 1);
                     int? userId = Context.HttpContext.Session.GetInt32("UserId");
                     cmd.Parameters.AddWithValue("UserId", userId);
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);

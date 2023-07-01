@@ -25,7 +25,7 @@ namespace ReadRate.Controllers
                 _conn.Open();
                 using (_conn)
                 {
-                    bookId = await GetBookId(book.ISBN.ToString());
+                    bookId = GetBookId(book.ISBN.ToString());
                     if (bookId == 0)
                     {
                         Console.WriteLine("Not Found");
@@ -199,7 +199,7 @@ namespace ReadRate.Controllers
             return user;
         }
 
-        public async Task<int> GetBookId(string ISBN)
+        public int GetBookId(string ISBN)
         {
             int bookId = 0;
             try
@@ -228,7 +228,7 @@ namespace ReadRate.Controllers
             return bookId;
         }
 
-        public async Task<int> NoCommMembers(int CommunityId)
+        public int NoOfCommMembers(int CommunityId)
         {
             int memberCount = 0;
             try
@@ -254,6 +254,7 @@ namespace ReadRate.Controllers
             } 
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 memberCount = 0;
             }
             return memberCount;

@@ -20,4 +20,11 @@
         public DateTime CreatedDate { get; set; }
         public virtual BookModel BookDetails { get; set; }
     }
+
+    public class UserRating
+    {
+        public  BookModel BookDetail { get; set; }
+        public int userRating { get; set; }
+        public Result result { get; set; }
+    }
 }

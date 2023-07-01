@@ -136,9 +136,34 @@ namespace ReadRate.Controllers
         }
 
         [HttpPost, Route("[action]" , Name ="AddPostLikeDislike")]
-        public Result AddPostLikeDislike(PostModel post)
+        public Result AddPostLikeDislike(AddPostLikeDislike postLike)
         {
-
+            Result result = new Result();
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                int? userId = Context.HttpContext.Session.GetInt32("UserId");
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("PostLikeDislike", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("PostId", postLike.post.PostId);
+                    cmd.Parameters.AddWithValue("LikeStatus", postLike.likeStatus);
+                    cmd.ExecuteNonQuery();
+                    result.result = true;
+                    result.message = postLike.likeStatus == 1 ? "Liked a Post" : "Disliked a Post";
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                result.result = false;
+                result.message = ex.Message;
+                Console.WriteLine(ex.Message);
+            }
+            return result;
         }
     }
 }

@@ -255,7 +255,16 @@ BEGIN
 SELECT * FROM BookShelf WHERE UserId=@UserId;
 END;
 
-
+CREATE OR ALTER PROCEDURE EditCommunity
+@CommunityId INT,
+@CommunityName VARCHAR(225),
+@CommunityDesc VARCHAR(MAX),
+@CommunityAdmin INT,
+@BookId INT
+AS
+BEGIN
+UPDATE Community SET CommunityName=@CommunityName, CommunityDesc=@CommunityDesc WHERE CommunityId=@CommunityId AND BookId=@BookId AND CommunityAdmin=@CommunityAdmin;
+END;
 
 SELECT * FROM PostLike
 SELECT * FROM BookShelf

@@ -2,6 +2,7 @@
 using System.Data.SqlClient;
 using ReadRate.Models;
 using System.Data;
+using System.Net;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -178,10 +179,9 @@ namespace ReadRate.Controllers
                     }
                     else
                     {
-                        BookCommunity bookCommunity = new BookCommunity();
-                        bookCommunity.result = new Models.Result();
-                        bookCommunity.result.result = true;
-                        bookCommunity.result.message = "No community was created ";
+                        community.result = new Models.Result();
+                        community.result.result = true;
+                        community.result.message = "No community was created ";
                     }
                 }
             }
@@ -397,6 +397,42 @@ namespace ReadRate.Controllers
             return result;
         }
 
+        [HttpPut, Route("[action]", Name ="EditCommunity")]
+        public BookCommunity EditCommunity(BookCommunity comm)
+        {
+            BookCommunity editedCommunity = new BookCommunity();
+            try
+            {
+                int? userId = Context.HttpContext.Session.GetInt32("UserId");
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                if(userId == comm.CommunityAdmin)
+                {
+                    using (_conn)
+                    {
+                        SqlCommand cmd = new SqlCommand("EditCommunity", _conn);
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@CommunityId", comm.CommunityId);
+                        cmd.Parameters.AddWithValue("@CommunityName", comm.CommunityName);
+                        cmd.Parameters.AddWithValue("@CommunityDesc", comm.CommunityDesc);
+                        cmd.Parameters.AddWithValue("@CommunityAdmin", userId);
+                        cmd.Parameters.AddWithValue("@BookId", comm.BookId);
+                        cmd.ExecuteNonQuery();
+                        editedCommunity = supplementaryController.GetCommunitybyId(comm.CommunityId);
+                        editedCommunity.result.result = true;
+                        editedCommunity.result.message = "Successfully removed the book from the shelf";
+                    }
+                }
+               
+            }
+            catch(Exception ex)
+            {
+                editedCommunity.result.result = false;
+                editedCommunity.result.message = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+            return editedCommunity;
+        }
 
 
 

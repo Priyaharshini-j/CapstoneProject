@@ -304,6 +304,52 @@ namespace ReadRate.Controllers
             }
             return LikeDislike;
         }
+        public BookCommunity GetCommunitybyId(int communityId)
+        {
+            BookCommunity community = new BookCommunity();
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("GetCommunitybyId", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CommunityId", communityId);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        Console.WriteLine("Found");
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            community.CommunityId = Convert.ToInt32(dr["CommunityId"]);
+                            community.CommunityName = dr["CommunityName"].ToString();
+                            community.CommunityDesc = dr["CommunityDesc"].ToString();
+                            community.CommunityAdmin = Convert.ToInt32(dr["CommunityAdmin"]);
+                            community.BookId = Convert.ToInt32(dr["BookId"]);
+                            community.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                            community.result = new Models.Result();
+                            community.result.result = true;
+                            community.result.message = "Community Created successfully";
+                        }
+                    }
+                    else
+                    {
+                        community.result = new Models.Result();
+                        community.result.result = true;
+                        community.result.message = "No community was created ";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return community;
+        
+        }
 
     }
 

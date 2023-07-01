@@ -9,4 +9,6 @@
         public virtual UserModel User { get; set; }
         public Result result { get; set; }
     }
+
+
 }

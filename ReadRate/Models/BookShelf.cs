@@ -17,4 +17,13 @@
         public string BookShelfName { get; set; }
         public Result result { get; set; }
     }
+
+    public class BookInShelf
+    {
+        public int BookShelfId { get; set; }
+        public BookModel Book { get; set; }
+        public string BookShelfName { get; set; }
+        public int UserId { get; set; }
+        public Result result { get; set; }
+    }
 }

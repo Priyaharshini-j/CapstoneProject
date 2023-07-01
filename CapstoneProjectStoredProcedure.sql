@@ -228,5 +228,34 @@ BEGIN
 INSERT INTO BookShelf VALUES (@UserId,@BookId,@ReadingStatus, GETDATE());
 END;
 
+CREATE OR ALTER PROCEDURE PostLikeDislike
+@UserId INT,
+@PostId INT,
+@LikeStatus INT
+AS
+BEGIN
+INSERT INTO PostLike VALUES (@PostId,@UserId,@LikeStatus,GETDATE());
+END;
 
+
+CREATE OR ALTER PROCEDURE RemoveBook
+@UserId INT,
+@BookId INT,
+@BookShelfId INT,
+@ReadingStatus VARCHAR(100)
+AS
+BEGIN
+DELETE FROM BookShelf WHERE BookShelfId=@BookShelfId AND UserId=@UserId AND BookId=@BookId AND ReadingStatus=@ReadingStatus;
+END;
+
+CREATE OR ALTER PROCEDURE ListBookInShelf
+@UserId INT
+AS
+BEGIN
+SELECT * FROM BookShelf WHERE UserId=@UserId;
+END;
+
+
+
+SELECT * FROM PostLike
 SELECT * FROM BookShelf

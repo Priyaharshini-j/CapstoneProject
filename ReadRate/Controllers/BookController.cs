@@ -292,13 +292,119 @@ namespace ReadRate.Controllers
             return addingBook;
         }
 
+        [HttpDelete, Route("[action]", Name = "DeleteMember")]
+        public Result DeletingMember (BookCommunity community)
+        {
+            Result result = new Result();
+            int? userId = Context.HttpContext.Session.GetInt32("UserId");
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("DeleteMember", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CommunityId", community.CommunityId);
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.ExecuteNonQuery();
+                    result.result = true;
+                    result.message = "Unfollwed the community" + community.CommunityName;
+                }
+            }
+            catch (Exception ex)
+            {
+                result.result = false;
+                result.message = ex.Message;
+            }
+            return result;
+        }
+
+        [HttpGet, Route("[action]", Name = "BookInShelf")]
+        public List<BookInShelf> ListBookInShelf()
+        {
+            List<BookInShelf> shelf = new List<BookInShelf>();
+            int? userId = Context.HttpContext.Session.GetInt32("UserId");
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("ListBookInShelf", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        Console.WriteLine("Found");
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            BookInShelf shelfBook = new BookInShelf();
+                            shelfBook.BookShelfName = dr["ReadingStatus"].ToString();
+                            int bookId = (int)dr["BookId"];
+                            shelfBook.UserId = (int)dr["UserId"];
+                            shelfBook.BookShelfId = (int)dr["BookShelfId"];
+                            shelfBook.Book = supplementaryController.GetBookByBookId(bookId);
+                            
+                            shelf.Add(shelfBook);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                BookInShelf shelfBook = new BookInShelf();
+                shelfBook.result = new Result();
+                shelfBook.result.result = false;
+                shelfBook.result.message = ex.Message;
+                Console.WriteLine(ex.Message.ToString());
+                shelf.Add(shelfBook);
+            }
+            return shelf;
+        }
+
+        [HttpDelete, Route("[action]", Name = "RemoveBook")]
+        public Result RemoveBook(BookInShelf bookInShelf)
+        {
+            Result result = new Result();
+            int? userId = Context.HttpContext.Session.GetInt32("UserId");
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("RemoveBook", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@BookShelfId", bookInShelf.BookShelfId);
+                    cmd.Parameters.AddWithValue("@UserId", bookInShelf.UserId);
+                    cmd.Parameters.AddWithValue("@BookId", bookInShelf.Book.BookId);
+                    cmd.Parameters.AddWithValue("@ReadingStatus", bookInShelf.BookShelfName);
+                    cmd.ExecuteNonQuery();
+                    result.result = true;
+                    result.message = "Successfully removed the book from the shelf";
+                }
+            }
+            catch(Exception ex)
+            {
+                result.result = false;
+                result.message = ex.Message;
+                Console.WriteLine(ex.Message.ToString());
+            }
+            return result;
+        }
+
+
+
 
 
         /*                                   
 
-                    [HttpPost, Route("[action]", Name = "")]
+                   
 
-                    [HttpPost, Route("[action]", Name = "")]
 
                     [HttpPost, Route("[action]", Name = "")]
 

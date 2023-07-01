@@ -348,7 +348,46 @@ namespace ReadRate.Controllers
                 Console.WriteLine(ex.Message);
             }
             return community;
-        
+        }
+
+        public UserCritique GetCritiqueById(int CritiqueId)
+        {
+            UserCritique critique = new UserCritique();
+            try
+            {
+                SqlCommand cmd = new SqlCommand("GetCritiqueById", _conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CritiqueId", CritiqueId);
+                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    Console.WriteLine("Found");
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        critique.CritiqueId = Convert.ToInt32(dr["CritiqueId"]);
+                        critique.BookId = Convert.ToInt32(dr["BookId"]);
+                        critique.UserId = Convert.ToInt32(dr["UserId"]);
+                        critique.CritiqueDesc = dr["CritiqueDesc"].ToString();
+                        critique.Like = getCritqueLikeByCritiqieId(critique.CritiqueId)[1];
+                        critique.Dislike = getCritqueLikeByCritiqieId(critique.CritiqueId)[0];
+                        critique.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                        critique.result.result = true;
+                        critique.result.message = "Found thwe critique";
+                    }
+                }
+                else
+                {
+                    critique.result.result = false;
+                    critique.result.message = "No Critique found on this ID";
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return critique;
         }
 
     }

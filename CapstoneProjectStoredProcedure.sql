@@ -297,5 +297,16 @@ BEGIN
 DELETE FROM Critique WHERE CritiqueId= @CritiqueId AND UserId = @UserId;
 END;
 
+CREATE OR ALTER PROCEDURE CreateCritiqueReply
+@CritiqueId INT,
+@UserId INT,
+@Reply VARCHAR(MAX)
+AS
+BEGIN
+INSERT INTO CritiqueReply VALUES(@CritiqueId,@UserId,@Reply,GETDATE());
+END;
+
+
+
 SELECT * FROM PostLike
-SELECT * FROM Critique
+SELECT * FROM CritiqueReply

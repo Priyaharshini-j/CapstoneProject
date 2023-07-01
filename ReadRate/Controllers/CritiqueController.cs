@@ -212,5 +212,56 @@ namespace ReadRate.Controllers
             }
             return result;
         }
+
+        [HttpPost, Route("[action]", Name ="CreatingCritiqueReply")]
+        public CritiqueWithReply CreatingCritiqueReply(CritiqueReply critiqueReply)
+        {
+            CritiqueWithReply critiqueWithReply = new CritiqueWithReply();
+            try
+            {
+                int? UserId = Context.HttpContext.Session.GetInt32("UserId");
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CritiqueId",critiqueReply.CritiqueId);
+                    cmd.Parameters.AddWithValue("@UserId", UserId);
+                    cmd.Parameters.AddWithValue("@Reply", critiqueReply.Reply);
+                    critiqueWithReply.critique = supplementaryController.GetCritiqueById(critiqueReply.CritiqueId);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        Console.WriteLine("Found");
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            CritiqueReply criReply = new CritiqueReply();
+                            criReply.CritiqueReplyId = (int)dr["CritiqueReplyId"];
+                            criReply.CritiqueId = Convert.ToInt32(dr["CritiqueId"]);
+                            criReply.UserId = Convert.ToInt32(dr["UserId"]);
+                            criReply.Reply = dr["Reply"].ToString();
+                            criReply.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                            critiqueWithReply.reply.Add(critiqueReply);
+                        }
+                    }
+                    else
+                    {
+                        critiqueWithReply.Result.result = true;
+                        critiqueWithReply.Result.message = "Critique reply was not added";
+                        Console.WriteLine("Critique reply was not added");
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                critiqueWithReply.Result.result = false;
+                critiqueWithReply.Result.message = ex.Message;
+                Console.WriteLine(ex.Message);
+            }
+            return critiqueWithReply;
+        }
     }
 }

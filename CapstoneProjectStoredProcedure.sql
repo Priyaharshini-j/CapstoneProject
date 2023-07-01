@@ -196,3 +196,25 @@ BEGIN
     VALUES (@BookId, @UserId, @userRatings, GETDATE());
     SELECT * FROM Book WHERE BookId = @BookId;
 END;
+
+CREATE OR ALTER Procedure CritiqueLikeDislike
+@CritiqueID INT
+AS
+BEGIN
+SELECT * FROM CritiqueLike WHERE CritiqueId=@CritiqueId;
+END;
+
+CREATE OR ALTER Procedure PostLikeDislike
+@PostId INT
+AS
+BEGIN
+SELECT * FROM PostLike WHERE PostId=@PostId;
+END;
+
+CREATE OR ALTER Procedure DeleteRating
+@BookId INT,
+@UserId INT
+AS
+BEGIN 
+DELETE FROM Rating WHERE BookId=@BookId AND UserId=@UserId;
+END;

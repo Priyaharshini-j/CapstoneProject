@@ -48,6 +48,8 @@ namespace ReadRate.Controllers
                             post.PostCaption = dr["PostCaption"].ToString();
                             post.UserId = Convert.ToInt32(dr["UserId"]);
                             post.BookId = Convert.ToInt32(dr["BookId"]);
+                            post.Like = supplementaryController.GetPostLikeDislike(post.PostId)[1];
+                            post.DisLike = supplementaryController.GetPostLikeDislike(post.PostId)[0];
                             post.Picture = (byte[])dr["Picture"];
                             post.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
                             postList.Add(post);
@@ -79,12 +81,13 @@ namespace ReadRate.Controllers
         [HttpGet, Route("[action]", Name = "UserPost")]
         public List<PostModel> UsersPost()
         {
-            _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
-            _conn.Open();
             int? UserId = Context.HttpContext.Session.GetInt32("UserId");
             List<PostModel> UserPosts = new List<PostModel>();
             try
             {
+
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
                 using (_conn)
                 {
                     SqlCommand cmd = new SqlCommand("GetUsersPost", _conn);
@@ -131,7 +134,5 @@ namespace ReadRate.Controllers
             _conn.Close();
             return UserPosts;
         }
-
-        []
     }
 }

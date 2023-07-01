@@ -258,7 +258,53 @@ namespace ReadRate.Controllers
                 memberCount = 0;
             }
             return memberCount;
-          }
+        }
+        public int[] GetPostLikeDislike(int PostId)
+        {
+            int[] LikeDislike = new int[2];
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("PostLikeDislike", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@PostId", PostId);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            int likeStatus = Convert.ToInt32(dr["LikeStatus"]);
+
+                            if (likeStatus == -1)
+                            {
+                                LikeDislike[0] = LikeDislike[0] + 1;
+                            }
+                            else if (likeStatus == 1)
+                            {
+                                LikeDislike[1] = LikeDislike[1] + 1;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        LikeDislike[0] = 0;
+                        LikeDislike[1] = 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return LikeDislike;
+        }
+
     }
 
 }

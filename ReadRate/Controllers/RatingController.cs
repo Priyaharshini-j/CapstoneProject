@@ -137,5 +137,36 @@ namespace ReadRate.Controllers
             }
             return rating;
         }
+
+        [HttpDelete, Route("[action]" , Name ="DeleteRating")]
+        public Result DeleteRating(int BookId)
+        {
+            Result result = new Result();
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                Context.HttpContext.Session.SetInt32("UserId", 1);
+                int? UserId = Context.HttpContext.Session.GetInt32("UserId");
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("DeleteRating", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@BookId", BookId);
+                    cmd.Parameters.AddWithValue("UserId", UserId);
+                    cmd.ExecuteNonQuery();
+                    result.result = true;
+                    result.message = "Rating for the book is deleted";
+
+                }
+
+            }
+            catch(SqlException ex)
+            {
+                result.result = false;
+                result.message = ex.ToString();
+            }
+            return result;
+        }
     } 
 }

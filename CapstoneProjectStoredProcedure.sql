@@ -304,9 +304,19 @@ CREATE OR ALTER PROCEDURE CreateCritiqueReply
 AS
 BEGIN
 INSERT INTO CritiqueReply VALUES(@CritiqueId,@UserId,@Reply,GETDATE());
+SELECT * FROM CritiqueReply WHERE CritiqueId=@CritiqueId;
 END;
 
 
+CREATE OR ALTER PROCEDURE LikeDislikeCritique
+@CritiqueId INT,
+@UserId INT,
+@LikeStatus INT
+AS
+BEGIN
+INSERT INTO CritiqueLike VALUES (@CritiqueId,@UserId,@LikeStatus,GETDATE());
+END;
+
 
 SELECT * FROM PostLike
-SELECT * FROM CritiqueReply
+SELECT * FROM CritiqueLike

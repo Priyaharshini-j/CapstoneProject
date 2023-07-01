@@ -224,7 +224,7 @@ namespace ReadRate.Controllers
                 _conn.Open();
                 using (_conn)
                 {
-                    SqlCommand cmd = new SqlCommand("", _conn);
+                    SqlCommand cmd = new SqlCommand("CreateCritiqueReply", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@CritiqueId",critiqueReply.CritiqueId);
                     cmd.Parameters.AddWithValue("@UserId", UserId);
@@ -262,6 +262,54 @@ namespace ReadRate.Controllers
                 Console.WriteLine(ex.Message);
             }
             return critiqueWithReply;
+        }
+
+        [HttpPost, Route("[action]", Name = "GetCritiqueReply")]
+        public CritiqueWithReply GetCritiqueAndReply(int critiqueId)
+        {
+            CritiqueWithReply critiqueWithReply = new CritiqueWithReply();
+            try
+            {
+                critiqueWithReply.critique = supplementaryController.GetCritiqueById(critiqueId);
+                critiqueWithReply.reply = supplementaryController.GetCritiqueReplyById(critiqueId);
+                critiqueWithReply.Result.result = true;
+                critiqueWithReply.Result.message = "List of reply and critique returned";
+            }
+            catch (Exception ex)
+            {
+                critiqueWithReply.Result.result = false;
+                critiqueWithReply.Result.message= ex.Message;
+            }
+            return critiqueWithReply;
+        }
+
+        [HttpPost, Route("[action]", Name ="CritiqueLikeDislike")]
+        public Result LikeDislikeCritique(int critiqueId, int LikeStatus )
+        {
+            Result result = new Result();
+            try
+            {
+                int? UserId = Context.HttpContext.Session.GetInt32("UserId");
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("LikeDislikeCritique", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CritiqueId", critiqueId);
+                    cmd.Parameters.AddWithValue("@UserId", UserId);
+                    cmd.Parameters.AddWithValue("@LikeStatus", LikeStatus);
+                    cmd.ExecuteNonQuery();
+                    result.result = true;
+                    result.message = "Liked a Critique";
+                }
+            }
+            catch (Exception ex)
+            {
+                result.result = false;
+                result.message = ex.Message;
+            }
+            return result;
         }
     }
 }

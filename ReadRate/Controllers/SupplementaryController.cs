@@ -107,7 +107,7 @@ namespace ReadRate.Controllers
                 Console.WriteLine(ex.Message);
             }
             return book;
-        } 
+        }
 
         public int[] getCritqueLikeByCritiqieId(int critqueId)
         {
@@ -210,7 +210,7 @@ namespace ReadRate.Controllers
                 {
                     SqlCommand cmd = new SqlCommand("GetBookId", _conn);
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@ISBN",ISBN);
+                    cmd.Parameters.AddWithValue("@ISBN", ISBN);
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     adapter.Fill(dt);
@@ -218,7 +218,7 @@ namespace ReadRate.Controllers
                     {
                         Console.WriteLine("Found");
                         bookId = (int)dt.Rows[0]["BookId"];
-                    }                    
+                    }
                 }
             }
             catch (Exception ex)
@@ -245,13 +245,13 @@ namespace ReadRate.Controllers
                     adapter.Fill(dt);
                     if (dt != null && dt.Rows.Count > 0)
                     {
-                        foreach(DataRow row in dt.Rows)
+                        foreach (DataRow row in dt.Rows)
                         {
                             memberCount++;
                         }
                     }
                 }
-            } 
+            }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
@@ -389,7 +389,53 @@ namespace ReadRate.Controllers
             }
             return critique;
         }
+        public List<CritiqueReply> GetCritiqueReplyById(int CritiqueId)
+        {
+            List<CritiqueReply> critiqueWithReply = new List<CritiqueReply>();
+            try
+            {
+                SqlCommand cmd = new SqlCommand("GetCritiqueReplyById", _conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CritiqueId", CritiqueId);
+                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    Console.WriteLine("Found");
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        CritiqueReply criReply = new CritiqueReply();
+                        criReply.CritiqueReplyId = (int)dr["CritiqueReplyId"];
+                        criReply.CritiqueId = Convert.ToInt32(dr["CritiqueId"]);
+                        criReply.UserId = Convert.ToInt32(dr["UserId"]);
+                        criReply.Reply = dr["Reply"].ToString();
+                        criReply.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                        criReply.result.result = true;
+                        criReply.result.message = "Found";
+                        critiqueWithReply.Add(criReply);
+                    }
+                }
+                else
+                {
+                    CritiqueReply reply = new CritiqueReply();
+                    reply.result.result = false;
+                    reply.result.message = "Not found";
+                    Console.WriteLine("No Critique reply found");
+                    critiqueWithReply.Add(reply);
 
+                }
+            }
+            catch (Exception ex)
+            {
+                CritiqueReply reply = new CritiqueReply();
+                reply.result.result = false;
+                reply.result.message = ex.Message;
+                Console.WriteLine(ex.Message);
+                critiqueWithReply.Add(reply);
+            }
+            return critiqueWithReply;
+        }
     }
 
 }

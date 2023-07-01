@@ -136,7 +136,7 @@ namespace ReadRate.Controllers
         }
 
         [HttpPost, Route("[action]", Name = "CreatingCritique")]
-        public UserCritique CreattingCritique(CritiqueModel critiqueModel)
+        public UserCritique CreatingCritique(CritiqueModel critiqueModel)
         {
             UserCritique critique = new UserCritique();
             int? UserId = Context.HttpContext.Session.GetInt32("UserId");

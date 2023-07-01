@@ -259,6 +259,38 @@ namespace ReadRate.Controllers
             return results;
         }
 
+        [HttpPost, Route("[action]" , Name ="AddToShelf")]
+        public async Task<Result> AddingBook (AddBookShelf bookShelf)
+        {
+            Result addingBook = new Result();
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using(_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("AddBookShelf", _conn);
+                    cmd.CommandType= CommandType.StoredProcedure;
+                    int? userId = Context.HttpContext.Session.GetInt32("UserId");
+                    int bookId = await supplementaryController.getBookIdByISBN(bookShelf.Book);
+                    cmd.Parameters.AddWithValue("@UserId",userId);
+                    cmd.Parameters.AddWithValue("@BookId", bookId);
+                    cmd.Parameters.AddWithValue("@ReadingStatus", bookShelf.BookShelfName);
+                    cmd.ExecuteNonQuery();
+                    addingBook.result = true;
+                    addingBook.message = "Book Added to the Shelf" + bookShelf.BookShelfName;
+
+                }
+
+            }
+            catch (SqlException ex)
+            {
+                addingBook.result = false;
+                addingBook.message = ex.Message;
+                Console.WriteLine(ex.ToString());
+            }
+            return addingBook;
+        }
 
 
 

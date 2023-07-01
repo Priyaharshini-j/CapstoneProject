@@ -218,3 +218,15 @@ AS
 BEGIN 
 DELETE FROM Rating WHERE BookId=@BookId AND UserId=@UserId;
 END;
+
+CREATE OR ALTER PROCEDURE AddBookShelf
+@UserId INT,
+@BookId INT,
+@ReadingStatus VARCHAR(100)
+AS
+BEGIN
+INSERT INTO BookShelf VALUES (@UserId,@BookId,@ReadingStatus, GETDATE());
+END;
+
+
+SELECT * FROM BookShelf

@@ -134,5 +134,11 @@ namespace ReadRate.Controllers
             _conn.Close();
             return UserPosts;
         }
+
+        [HttpPost, Route("[action]" , Name ="AddPostLikeDislike")]
+        public Result AddPostLikeDislike(PostModel post)
+        {
+
+        }
     }
 }

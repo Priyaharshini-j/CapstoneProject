@@ -10,4 +10,11 @@
         public virtual BookModel Book { get; set; }
         public Result result { get; set; }
     }
+
+    public class AddBookShelf
+    {
+        public virtual BookModel Book { get; set; }
+        public string BookShelfName { get; set; }
+        public Result result { get; set; }
+    }
 }

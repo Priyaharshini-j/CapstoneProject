@@ -196,7 +196,7 @@ namespace ReadRate.Controllers
                 _conn.Open();
                 using (_conn)
                 {
-                    SqlCommand cmd = new SqlCommand("DeleteCritique");
+                    SqlCommand cmd = new SqlCommand("DeleteCritique",_conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@CritiqueId", critiqueId);
                     cmd.Parameters.AddWithValue("@UserId", UserId);
@@ -311,5 +311,119 @@ namespace ReadRate.Controllers
             }
             return result;
         }
+
+        [HttpPut, Route("[action]", Name = "EditCritique")]
+        public UserCritique EditCritique(CritiqueModel critiqueModel)
+        {
+            int? UserId = Context.HttpContext.Session.GetInt32("UserId");
+            UserCritique editedCritique = new UserCritique();
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("EditCritique", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("CritiqueId", critiqueModel.CritiqueId);
+                    cmd.Parameters.AddWithValue("@BookId", critiqueModel.BookId);
+                    cmd.Parameters.AddWithValue("@UserId", UserId);
+                    cmd.Parameters.AddWithValue("CritiqueDesc", critiqueModel.CritiqueDesc);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        Console.WriteLine("Found");
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            editedCritique.CritiqueId = Convert.ToInt32(dr["CritiqueId"]);
+                            editedCritique.BookId = Convert.ToInt32(dr["BookId"]);
+                            editedCritique.UserId = Convert.ToInt32(dr["UserId"]);
+                            editedCritique.CritiqueDesc = dr["CritiqueDesc"].ToString();
+                            editedCritique.Like = supplementaryController.getCritqueLikeByCritiqieId(editedCritique.CritiqueId)[1];
+                            editedCritique.Dislike = supplementaryController.getCritqueLikeByCritiqieId(editedCritique.CritiqueId)[0];
+                            editedCritique.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                        }
+                    }
+                    else
+                    {
+                        editedCritique.result = new Models.Result();
+                        editedCritique.result.result = true;
+                        editedCritique.result.message = "No Critique found";
+                        Console.WriteLine("No Critique found");
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                editedCritique.result.result = false;
+                editedCritique.result.message = ex.Message;
+            }
+            return editedCritique;
+        }
+
+        [HttpPut, Route("[action]", Name = "EditedCritiqueReply")]
+        public CritiqueWithReply EditedCritiqueReply(CritiqueReply reply)
+        {
+            CritiqueWithReply editedCritique = new CritiqueWithReply();
+            try
+            {
+                int? UserId = Context.HttpContext.Session.GetInt32("UserId");
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("EditCritiqueReply", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@UserId", UserId);
+                    cmd.Parameters.AddWithValue("@CritiqueReplyId", reply.CritiqueReplyId);
+                    cmd.Parameters.AddWithValue("@CritiqueId", reply.CritiqueId);
+                    cmd.Parameters.AddWithValue("@Reply", reply.Reply);
+                    cmd.ExecuteNonQuery();
+                    editedCritique.critique = supplementaryController.GetCritiqueById(reply.CritiqueId);
+                    editedCritique.reply = supplementaryController.GetCritiqueReplyById(reply.CritiqueId);
+                    editedCritique.Result.result = true;
+                }
+            }
+            catch(Exception ex)
+            {
+                editedCritique.Result.result= false;
+                editedCritique.Result.message = ex.Message;
+            }
+            return editedCritique;
+        }
+
+
+        /*
+        [HttpDelete, Route("[action]", Name ="DeleteCritiqueReply")]
+        public Result DeleteReply(int CritiqueReplyId)
+        {
+            Result result = new Result();
+            try
+            {
+
+                int? UserId = Context.HttpContext.Session.GetInt32("UserId");
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("DeleteCritiqueReply", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CritiqueReplyId", CritiqueReplyId);
+                    cmd.Parameters.AddWithValue("@UserId", UserId);
+                    cmd.ExecuteNonQuery();
+                    result.result = true;
+                    result.message = "Successfull in deletion";
+                }
+            }
+            catch(Exception ex)
+            { 
+                result.result = false;
+                result.message = ex.Message; 
+            }
+            return result;
+        }
+        */
     }
 }

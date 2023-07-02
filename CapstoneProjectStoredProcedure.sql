@@ -317,6 +317,36 @@ BEGIN
 INSERT INTO CritiqueLike VALUES (@CritiqueId,@UserId,@LikeStatus,GETDATE());
 END;
 
+CREATE OR ALTER PROCEdURE DeleteCritiqueReply
+@CritiqueReplyId INT,
+@UserId INT
+AS
+DELETE FROM CritiqueReply WHERE CritiqueReplyId=@CritiqueReplyId AND UserId=@UserId;
 
-SELECT * FROM PostLike
-SELECT * FROM CritiqueLike
+CREATE OR ALTER PROCEdURE DeleteCritique
+@CritiqueId INT,
+@UserId INT
+AS
+BEGIN
+DELETE FROM CritiqueReply WHERE CritiqueId=@CritiqueId AND UserId=@UserId;
+DELETE FROM CritiqueLike WHERE CritiqueId=@CritiqueId
+DELETE FROM Critique WHERE CritiqueId=@CritiqueId AND UserId=@UserId;
+END;
+
+CREATE OR ALTER PROCEDURE EditCritique
+@CritiqueId INT,
+@BookId INT,
+@UserId INT,
+@CritiqueDesc VARCHAR(MAX)
+AS
+BEGIN
+UPDATE Critique SET CritiqueDesc=@CritiqueDesc WHERE CritiqueId=@CritiqueId AND UserId=@UserId AND BookId=@BookId;
+SELECT * FROM Critique WHERE CritiqueId=@CritiqueId;
+END;
+
+
+CREATE OR ALTER PROCEDURE EditCritiqueReply
+
+
+SELECT * FROM PostLike;
+SELECT * FROM Critique

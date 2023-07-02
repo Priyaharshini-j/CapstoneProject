@@ -10,4 +10,14 @@
         public virtual CommunityDiscussion CommunityDiscussion { get; set;}
         public Result result { get; set; }
     }
+
+    public class ListDiscussionReply
+    {
+        public CommunityDiscussion communityDiscussion { get; set; }
+        public List<DiscussionReply> discussionReply { get; set;}
+        public List<string> UserName { get; set; }
+        public Result result { get; set; }
+    }
+
+
 }

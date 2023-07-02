@@ -346,7 +346,63 @@ END;
 
 
 CREATE OR ALTER PROCEDURE EditCritiqueReply
+@UserId iNT,
+@CritiqueReplyId INT,
+@CritiqueId INT,
+@Reply VARCHAR(MAX)
+AS
+BEGIN
+UPDATE CritiqueReply SET Reply=@Reply WHERE CritiqueReplyId=@CritiqueReplyId AND CritiqueId=@CritiqueId AND UserId=@UserId;
+END;
+
+CREATE OR ALTER PROCEDURE GetUserNameByUserId 
+@UserId INT
+AS
+SELECT UserName From Users WHERE UserId=@UserId;
+
+CREATE OR ALTER PROCEDURE GetUserNameByMemberId
+    @CommunityMemberId INT,
+    @UserId INT OUTPUT
+AS
+BEGIN
+    SELECT @UserId = UserId
+    FROM CommunityMembers
+    WHERE CommunityMemberId = @CommunityMemberId;
+
+    SELECT UserName
+    FROM Users
+    WHERE UserId = @UserId;
+END;
+
+CREATE OR ALTER PROCEDURE ListDiscussion
+@communityId INT
+AS
+SELECT * FROM CommunityDiscussion WHERE CommunityId =@communityId;
+
+
+
+
+
+CREATE OR ALTER PROCEDURE ListDiscussionReply
+@DiscussionId INT
+AS
+SELECT * FROM CommunityDiscussion WHERE DiscussionId=@DiscussionId;
+
+
+CREATE OR ALTER PROCEDURE GetDiscussionByDiscussionId
+@discussionId INT
+AS
+SELECT * FROM CommunityDiscussion WHERE DiscussionId=@discussionId;
+
+
+CREATE OR ALTER DeleteDiscussionReply
+@DiscussionReplyId INT
+AS
+DELETE FROM DiscussionReply WHERE DiscussionReplyId=@DiscussionReplyId
+
+
+
 
 
 SELECT * FROM PostLike;
-SELECT * FROM Critique
+SELECT * FROM DiscussionReply;

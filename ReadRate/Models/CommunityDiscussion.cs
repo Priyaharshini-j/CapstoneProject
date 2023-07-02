@@ -9,4 +9,11 @@
         public DateTime CreatedDate { get; set; }
         public Result result { get; set; }
     }
+
+    public class DiscussionList
+    {
+        public List<CommunityDiscussion> Discussions { get; set; }
+        public List<string> UserName { get; set; }
+        public Result result { get; set; }
+    }
 }

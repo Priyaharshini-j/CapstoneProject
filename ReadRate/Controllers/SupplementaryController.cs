@@ -12,9 +12,11 @@ namespace ReadRate.Controllers
     {
         SqlConnection _conn;
         private readonly IConfiguration configuration;
-        public SupplementaryController(IConfiguration _configuration)
+        IHttpContextAccessor Context;
+        public SupplementaryController(IConfiguration _configuration, IHttpContextAccessor context)
         {
             configuration = _configuration;
+            Context = context;
         }
         public async Task<int> getBookIdByISBN(BookModel book)
         {
@@ -436,6 +438,121 @@ namespace ReadRate.Controllers
             }
             return critiqueWithReply;
         }
+
+        public string GetUserNameByMemberId(int memberId)
+        {
+            string userName = "";
+            try
+            {
+                SqlCommand cmd = new SqlCommand("GetUserNameByMemberId", _conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CommunityMemberId", memberId);
+                SqlDataReader dr = cmd.ExecuteReader();
+                while (dr.Read())
+                {
+                    userName = dr.GetString("UserName");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return userName;
+        }
+
+        public string GetUserNameByUserId()
+        {
+            string userName = "";
+            int? UserId = Context.HttpContext.Session.GetInt32("UserID");
+            try
+            {
+                SqlCommand cmd = new SqlCommand("GetUserNameByUserId", _conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CommunityMemberId", UserId);
+                SqlDataReader dr = cmd.ExecuteReader();
+                while (dr.Read())
+                {
+                    userName = dr.GetString("UserName");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return userName;
+        }
+        public CommunityDiscussion GetDiscussionByDiscussionId(int discussionId)
+        {
+            CommunityDiscussion communityDiscussion = new CommunityDiscussion();
+            try
+            {
+                using (_conn)
+                {
+
+                    SqlCommand cmd = new SqlCommand("GetDiscussionByDiscussionId", _conn);
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@DiscussionId", discussionId);
+                    SqlDataReader dr = cmd.ExecuteReader();
+                    while (dr.Read())
+                    {
+                        communityDiscussion.DiscussionId = Convert.ToInt32(dr["DiscussionId"]);
+                        communityDiscussion.CommunityId = Convert.ToInt32(dr["CommunityId"]);
+                        communityDiscussion.CommunityMemberId = Convert.ToInt32(dr["CommunityMemberId"]);
+                        communityDiscussion.Discussion = dr["DiscussionId"].ToString();
+                        communityDiscussion.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                        communityDiscussion.result.result = true;
+                        communityDiscussion.result.message = "Retrieved the discussion details";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                communityDiscussion.result.result = false;
+                communityDiscussion.result.message= ex.Message;
+            }
+            return communityDiscussion;
+        }
+
+        public DiscussionList GetListDiscussion(int communityId)
+        {
+            DiscussionList discussionList = new DiscussionList();
+            try
+            {
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("ListDiscussion", _conn);
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@communityId", communityId);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        Console.WriteLine("Found");
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            CommunityDiscussion communityDiscussion = new CommunityDiscussion();
+                            communityDiscussion.DiscussionId = Convert.ToInt32(dr["DiscussionId"]);
+                            communityDiscussion.CommunityMemberId = Convert.ToInt32(dr["CommunityMemberId"]);
+                            communityDiscussion.CommunityId = Convert.ToInt32(dr["CommunityId"]);
+                            communityDiscussion.Discussion = dr["Discussion"].ToString();
+                            discussionList.Discussions.Add(communityDiscussion);
+                            discussionList.UserName.Add(GetUserNameByMemberId(communityDiscussion.CommunityMemberId));
+                        }
+                    }
+                    discussionList.result.result = true;
+                    discussionList.result.message = "List of discussions";
+                }
+            }
+            catch (Exception ex)
+            {
+                discussionList.result.result = false;
+                discussionList.result.message = ex.Message;
+                Console.WriteLine(ex.Message);
+            }
+            return discussionList;
+        }
     }
+
 
 }

@@ -395,14 +395,36 @@ AS
 SELECT * FROM CommunityDiscussion WHERE DiscussionId=@discussionId;
 
 
-CREATE OR ALTER DeleteDiscussionReply
+CREATE OR ALTER PROCEDURE DeleteDiscussionReply
 @DiscussionReplyId INT
 AS
-DELETE FROM DiscussionReply WHERE DiscussionReplyId=@DiscussionReplyId
+DELETE FROM DiscussionReply WHERE DiscussionReplyId=@DiscussionReplyId;
+
+CREATE OR ALTER PROCEDURE GetMemberId
+@CommunityId INT,
+@UserId INT
+AS
+SELECT UserID FROM CommunityMembers WHERE CommunityId=@CommunityId AND UserID=@UserId;
 
 
+CREATE OR ALTER PROCEDURE CreateDiscussion
+@CommunityId INT,
+@CommunityMemberId INT,
+@Discussion VARCHAR(MAX)
+AS
+BEGIN
+INSERT INTO CommunityDiscussion VALUES (@CommunityId, @CommunityMemberId, @Discussion, GETDATE())
+END;
 
 
+CREATE OR ALTER PROCEDURE CreateDiscussionReply
+@DiscussionId INT,
+@CommunityMemberId INT,
+@DiscussionReply VARCHAR(MAX)
+AS
+BEGIN
+INSERT INTO DiscussionReply VALUES (@DiscussionId,@CommunityMemberId,@DiscussionReply,GETDATE())
+END;
 
 SELECT * FROM PostLike;
 SELECT * FROM DiscussionReply;

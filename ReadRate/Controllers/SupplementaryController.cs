@@ -13,10 +13,12 @@ namespace ReadRate.Controllers
         SqlConnection _conn;
         private readonly IConfiguration configuration;
         IHttpContextAccessor Context;
+        int? UserId;
         public SupplementaryController(IConfiguration _configuration, IHttpContextAccessor context)
         {
             configuration = _configuration;
             Context = context;
+            UserId = Context.HttpContext.Session.GetInt32("UserId");
         }
         public async Task<int> getBookIdByISBN(BookModel book)
         {
@@ -551,6 +553,80 @@ namespace ReadRate.Controllers
                 Console.WriteLine(ex.Message);
             }
             return discussionList;
+        }
+
+        public int GetMemberId(int communityId)
+        {
+            int memberId = 0;
+            try
+            {
+                using(_conn)
+                {
+
+                    SqlCommand cmd = new SqlCommand("GetMemberId", _conn);
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@UserId", UserId);
+                    cmd.Parameters.AddWithValue("@CommunityId", communityId);
+                    SqlDataReader dr = cmd.ExecuteReader();
+                    while(dr.Read())
+                    {
+                        memberId = Convert.ToInt32(dr["UserId"]);
+                    }
+                }
+            }
+            catch(SqlException ex) 
+            { 
+                memberId=0;
+                Console.WriteLine(ex.Message);
+            }
+            return memberId;
+        }
+
+        public ListDiscussionReply GetDiscussionReplyByDiscussionId (int discussionId)
+        {
+            ListDiscussionReply listDiscussionReply = new ListDiscussionReply();
+            try
+            {
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("ListDiscussionReply", _conn);
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@DiscussionId", discussionId);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        Console.WriteLine("Found");
+                        listDiscussionReply.communityDiscussion =GetDiscussionByDiscussionId(discussionId);
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            DiscussionReply reply = new DiscussionReply();
+                            reply.DiscussionReplyId = Convert.ToInt32(dr["DiscussionReplyId"]);
+                            reply.DiscussionId = Convert.ToInt32(dr["DiscussionId"]);
+                            reply.CommunityMemberId = Convert.ToInt32(dr["CommunityMemberId"]);
+                            reply.Reply = dr["Reply"].ToString();
+                            reply.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                            listDiscussionReply.UserName.Add(GetUserNameByMemberId(reply.CommunityMemberId));
+                            listDiscussionReply.discussionReply.Add(reply);
+                            listDiscussionReply.result.result = true;
+                            listDiscussionReply.result.message = "Listed the replies";
+                        }
+                    }
+                    else
+                    {
+                        listDiscussionReply.result.result = true;
+                        listDiscussionReply.result.message = "No replies to the Discussion";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                listDiscussionReply.result.result = false;
+                listDiscussionReply.result.message = ex.Message;
+                Console.WriteLine(ex.Message);
+            }
+            return listDiscussionReply;
         }
     }
 

@@ -137,10 +137,61 @@ namespace ReadRate.Controllers
 
             return result;
         }
-        /*
 
         [HttpPost, Route("[action]", Name ="CreateDiscussion")]
-        public DiscussionList CreateDiscussion(D)
-        */
+        public DiscussionList CreateDiscussion(CommunityDiscussion communityDiscussion)
+        {
+            DiscussionList discussionList = new DiscussionList();
+            try
+            {
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("CreateDiscussion", _conn);
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("CommunityId", communityDiscussion.CommunityId);
+                    cmd.Parameters.AddWithValue("CommunityMemberId", supplementaryController.GetMemberId(communityDiscussion.CommunityId));
+                    cmd.Parameters.AddWithValue("Discussion", communityDiscussion.Discussion);
+                    cmd.ExecuteNonQuery();
+                    discussionList.result.result = true;
+                    discussionList.result.message = "Successful in creation";
+                    discussionList = supplementaryController.GetListDiscussion(communityDiscussion.CommunityId);
+                }
+            }
+            catch(SqlException ex)
+            {
+                discussionList.result.result = false;
+                discussionList.result.message = ex.Message;
+            }
+            return discussionList;
+        }
+        [HttpPost, Route("[action]", Name = "CreateDiscussionReply")]
+        public ListDiscussionReply CreateDiscussionReply(DiscussionReply discussionReply)
+        {
+            ListDiscussionReply listDiscussionReply = new ListDiscussionReply();
+            try
+            {
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("CreateDiscussionReply", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@DiscussionId", discussionReply.DiscussionId);
+                    int? userId = Context.HttpContext.Session.GetInt32("UserId");
+                    int convertedUserId = userId.HasValue ? userId.Value : 0;
+                    cmd.Parameters.AddWithValue("@MemberId", supplementaryController.GetMemberId(convertedUserId));
+                    cmd.Parameters.AddWithValue("@Reply", discussionReply.Reply);
+                    cmd.ExecuteNonQuery();
+                    listDiscussionReply = supplementaryController.GetDiscussionReplyByDiscussionId(discussionReply.DiscussionId);
+
+                }
+            }
+            catch(Exception ex)
+            {
+                listDiscussionReply.result.result = false;
+                listDiscussionReply.result.message = ex.Message;
+                Console.WriteLine(ex.Message);
+            }
+            return listDiscussionReply;
+        }
+
     }
 }

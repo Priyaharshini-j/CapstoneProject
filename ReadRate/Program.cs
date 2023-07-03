@@ -22,7 +22,16 @@ namespace ReadRate
 
             builder.Services.AddHttpContextAccessor();
 
-
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin",
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:3000") // Add your frontend origin here
+                               .AllowAnyHeader()
+                               .AllowAnyMethod();
+                    });
+            });
 
             var app = builder.Build();
 
@@ -36,6 +45,8 @@ namespace ReadRate
             app.UseAuthorization();
 
             app.UseSession();
+
+            app.UseCors("AllowSpecificOrigin");
 
             app.MapControllers();
 

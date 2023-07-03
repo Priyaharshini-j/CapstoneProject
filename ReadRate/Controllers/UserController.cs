@@ -4,11 +4,13 @@ using System.Data;
 using Microsoft.AspNetCore.Http;
 using System.Data.SqlClient;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.Cors;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace ReadRate.Controllers
 {
+    [EnableCors("AllowSpecificOrigin")]
     [Route("[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -17,6 +19,7 @@ namespace ReadRate.Controllers
         private readonly IConfiguration _configuration;
         IHttpContextAccessor Context;
         SupplementaryController supplementaryController;
+        public int? UserId;
         public UserController(IConfiguration configuration, IHttpContextAccessor context , SupplementaryController _supplementaryController)
         {
             _configuration = configuration;
@@ -49,6 +52,7 @@ namespace ReadRate.Controllers
                         {
                             userModel.UserName = dt.Rows[0]["UserName"].ToString();
                             userModel.UserId = (int)dt.Rows[0]["UserId"];
+                            userModel.UserEmail = dt.Rows[0]["UserEmail"].ToString();
                             userModel.Password = dt.Rows[0]["Password"].ToString();
                             userModel.SecurityQn = dt.Rows[0]["SecurityQn"].ToString();
                             userModel.SecurityAns = dt.Rows[0]["SecurityAns"].ToString();
@@ -57,11 +61,12 @@ namespace ReadRate.Controllers
                             Context.HttpContext.Session.SetString("UserEmail", userModel.UserEmail);
                             userModel.result.result = true;
                             userModel.result.message = "success";
+                            Console.WriteLine("Success");
                         }
                         else
                         {
                             userModel.result.result = false;
-                            userModel.result.message = "Invalid user";
+                            userModel.result.message = "Invalid userEmail or Passsword";
                         }
                     }
                 }
@@ -131,13 +136,16 @@ namespace ReadRate.Controllers
                 if (userModel.UserName != null && userModel.UserEmail != null && userModel.Password != null && userModel.SecurityAns != null && userModel.SecurityQn != null)
                 {
 
+                    int? convertedUserID = Context.HttpContext.Session.GetInt32("UserId");
+                    int UserId = convertedUserID.HasValue ? convertedUserID.Value : 0;
+
                     conn = new SqlConnection(_configuration["ConnectionStrings:SqlConn"]);
                     conn.Open();
                     using (conn)
                     {
                         SqlCommand cmd = new SqlCommand("UpdateUser", conn);
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.AddWithValue("@UserId", userModel.UserId);
+                        cmd.Parameters.AddWithValue("@UserId", convertedUserID);
                         cmd.Parameters.AddWithValue("@Password", userModel.Password);
                         cmd.Parameters.AddWithValue("@SecurityQn", userModel.SecurityQn);
                         cmd.Parameters.AddWithValue("@SecurityAns", userModel.SecurityAns);

@@ -1,0 +1,48 @@
+*
+{
+  margin: 2px 3px;
+}
+
+.navigation{
+  display: flex;
+  flex-direction: row;
+}
+
+
+.heading-container-1
+{
+  display: flex;   
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-content: center;
+  align-items: center;
+  
+}
+
+
+.heading
+{
+  display: flex;
+  justify-content: flex-start;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 34px;
+  margin: 10px 5px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  background-color: #AA96DA;
+  animation: rotate 3s infinite ease-in-out;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

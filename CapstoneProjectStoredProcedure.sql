@@ -15,6 +15,12 @@ BEGIN
 SELECT * FROM Users WHERE UserId=@UserId;
 END;
 
+CREATE OR ALTER PROCEDURE GetUsersCritique
+@UserId INT
+AS
+SELECT * FROM Critique WHERE UserId=@UserId;
+
+
 
 
 --Creating the procedure to Creating a user profile

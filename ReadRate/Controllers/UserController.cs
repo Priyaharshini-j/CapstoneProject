@@ -86,7 +86,7 @@ namespace ReadRate.Controllers
             return userModel;
         }
         [HttpPost, Route("[action]", Name = "SignUp")]
-        public Models.Result SignUp(UserModel userModel)
+        public Models.Result SignUp(signUpModel userModel)
         {
             Models.Result result = new Models.Result();
             try

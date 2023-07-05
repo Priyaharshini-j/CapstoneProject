@@ -214,5 +214,40 @@ namespace ReadRate.Controllers
             return result;
         }
 
+        [HttpGet , Route("[action]", Name = "FetchUserName")]
+        public signUpModel FetchUserName()
+        {
+            Console.WriteLine("inside the func");
+            signUpModel signUpModel = new signUpModel();
+            try
+            {
+                Console.WriteLine("inisde he try");
+                conn = new SqlConnection(_configuration["ConnectionStrings:SqlConn"]);
+                conn.Open();
+                int? convertedUserID = Context.HttpContext.Session.GetInt32("UserId");
+                int UserId = convertedUserID.HasValue ? convertedUserID.Value : 0;
+                using (conn)
+                {
+                    Console.WriteLine("inside hte using");
+                    Console.WriteLine(UserId);
+                    SqlCommand cmd = new SqlCommand("getUserName", conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@UserId", UserId);
+                    SqlDataReader dr = cmd.ExecuteReader();
+                    while(dr.Read())
+                    {
+                        Console.WriteLine("inside hte reading");
+                        signUpModel.UserName = dr["UserName"].ToString();
+                        Console.WriteLine(signUpModel.UserName);
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            
+            return signUpModel;
+        }
     }
 }

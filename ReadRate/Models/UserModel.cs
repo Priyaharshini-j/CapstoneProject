@@ -31,6 +31,11 @@ namespace ReadRate.Models
 
     }
 
+    public class loginModel
+    {
+        public string UserName { get; set; }
+    }
+
 
 
 }

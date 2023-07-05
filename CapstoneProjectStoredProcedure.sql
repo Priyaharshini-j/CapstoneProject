@@ -434,3 +434,9 @@ END;
 
 SELECT * FROM PostLike;
 SELECT * FROM DiscussionReply;
+
+
+CREATE OR ALTER PROCEDURE getUserName
+@UserId INT
+AS
+SELECT UserName FROM Users WHERE UserId=@UserId;

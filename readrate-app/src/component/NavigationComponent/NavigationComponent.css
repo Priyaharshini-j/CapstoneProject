@@ -46,3 +46,132 @@
     transform: rotate(360deg);
   }
 }
+ul
+{
+  padding: 0 20px 0 0px;
+}
+.navigation-bar
+{
+  display: flex;
+  flex-direction: row;
+  column-gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* NavigationComponent.css */
+
+.navigation {
+  display: flex;
+  justify-content: space-between;
+}
+
+.heading-container-1 {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.heading {
+  margin-left: 10px;
+}
+
+.navigation-bar {
+  display: flex;
+  align-items: center;
+}
+
+.link {
+  margin-right: 10px;
+}
+
+@media(min-width: 1000px){
+  .hamburger-menu{
+    display: none;
+  }
+}
+
+@media (max-width: 1000px) {
+  .navigation-bar {
+    display: none;
+  }
+  
+  .heading-container-1 {
+    justify-content: space-between;
+  }
+  
+  .hamburger-menu {
+    display: flex;
+    align-items: center;
+  }
+  
+  .hamburger-menu .heading {
+    margin-left: 0;
+  }
+  
+  .hamburger-menu .dot {
+    display: block;
+  }
+  
+  .hamburger-menu .menu-icon {
+    display: block;
+    width: 30px;
+    height: 30px;
+    background-color: #AA96DA;
+    cursor: pointer;
+  }
+  
+  .hamburger-menu .menu-icon::before,
+  .hamburger-menu .menu-icon::after {
+    content: "";
+    position: absolute;
+    width: 30px;
+    height: 4px;
+    background-color: #FFF;
+    transition: transform 0.3s ease;
+  }
+  
+  .hamburger-menu .menu-icon::before {
+    transform: translateY(-8px);
+  }
+  
+  .hamburger-menu .menu-icon::after {
+    transform: translateY(8px);
+  }
+  
+  .hamburger-menu .menu-icon.open::before {
+    transform: translateY(0) rotate(45deg);
+  }
+  
+  .hamburger-menu .menu-icon.open::after {
+    transform: translateY(0) rotate(-45deg);
+  }
+  
+  .hamburger-menu .menu-icon.open {
+    background-color: transparent;
+  }
+  
+  .hamburger-menu .menu-icon.open::before,
+  .hamburger-menu .menu-icon.open::after {
+    background-color: #FFF;
+  }
+  
+  .hamburger-menu .menu-icon:hover::before,
+  .hamburger-menu .menu-icon:hover::after {
+    background-color: #FFF;
+  }
+  
+  .hamburger-menu .menu-icon:hover.open::before,
+  .hamburger-menu .menu-icon:hover.open::after {
+    background-color: transparent;
+  }
+  
+  .hamburger-menu .menu-icon:focus {
+    outline: none;
+  }
+  
+  .hamburger-menu .menu-icon:focus::before,
+  .hamburger-menu .menu-icon:focus::after {
+    background-color: #FFF;
+  }
+}

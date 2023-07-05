@@ -1,8 +1,8 @@
 import axios from 'axios'
 import React, { useState } from 'react'
 import './SignupComponent.css'
+import LoginPage from '../../pages/LoginPage'
 import LoginComponent from '../LoginComponent/LoginComponent'
-import NavigationComponent from '../NavigationComponent/NavigationComponent'
 
 export const SignupComponent = () => {
   const [userName, setUserName] = useState("")
@@ -14,7 +14,11 @@ export const SignupComponent = () => {
   const [logIn, setLogIn] = useState(false)
 
   const handleSignUp = async () => {
-    if (password === confirmPassword) {
+    if(userName !== null || userEmail !== null || password!== null || confirmPassword !== null || securityQn !== null ||securityAns !== null)
+    {
+      alert("Fill all the fields");
+    }
+    if (password === confirmPassword && password !== null && confirmPassword !== null) {
       const data = {
         userName: userName,
         userEmail: userEmail,
@@ -46,7 +50,6 @@ export const SignupComponent = () => {
 
   return (
     <React.Fragment>
-      <NavigationComponent />
       <div className='signup-container'>
         <div className="card">
           <h3 className="card-heading">Sign Up Your Account</h3>

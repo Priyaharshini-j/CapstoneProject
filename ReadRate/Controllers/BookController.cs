@@ -309,7 +309,7 @@ namespace ReadRate.Controllers
                     cmd.Parameters.AddWithValue("@UserId", userId);
                     cmd.ExecuteNonQuery();
                     result.result = true;
-                    result.message = "Unfollwed the community" + community.CommunityName;
+                    result.message = "Unfollwed the community";
                 }
             }
             catch (Exception ex)

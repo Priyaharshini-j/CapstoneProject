@@ -146,11 +146,11 @@ namespace ReadRate.Controllers
                 _conn.Open();
                 using (_conn)
                 {
-                    SqlCommand cmd = new SqlCommand("CreateCritique");
+                    SqlCommand cmd = new SqlCommand("CreateCritique",_conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@BookId",critiqueModel.BookId);
                     cmd.Parameters.AddWithValue("@UserId", UserId);
-                    cmd.Parameters.AddWithValue("CritiqueDesc", critiqueModel.CritiqueDesc);
+                    cmd.Parameters.AddWithValue("@CritiqueDesc", critiqueModel.CritiqueDesc);
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     adapter.Fill(dt);

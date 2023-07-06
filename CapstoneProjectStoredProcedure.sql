@@ -20,7 +20,20 @@ CREATE OR ALTER PROCEDURE GetUsersCritique
 AS
 SELECT * FROM Critique WHERE UserId=@UserId;
 
-
+--Community->CommunityMembers->CommunityDiscussion->DiscussionReply
+--Critic->CritiqueReply
+--Critic->CritiqueLike
+--Post->PostLike
+CREATE OR ALTER PROCEDURE DeleteUser
+@UserId INT,
+@Memid INT OUTPUT
+AS
+BEGIN
+SET @memid = SELECT UserId from CommunityMembers WHERE UserId=UserId
+DELETE FROM DiscussionReply WHERE Member=@UserId;
+DELETE FROM CommunityDiscussion WHERE UserId=@UserId;
+S
+END;
 
 
 --Creating the procedure to Creating a user profile
@@ -142,10 +155,11 @@ CREATE OR ALTER PROCEDURE CreateCommunity
     @CommunityName VARCHAR(225),
     @CommunityDesc VARCHAR(MAX),
     @CommunityAdmin INT,
-    @BookId INT,
-    @CommunityId INT OUTPUT
+    @BookId INT
 AS
 BEGIN
+    DECLARE @CommunityId INT; -- Declare the CommunityId variable
+
     INSERT INTO Community
     VALUES (@CommunityName, @CommunityDesc, @CommunityAdmin, @BookId, GETDATE());
 
@@ -440,3 +454,39 @@ CREATE OR ALTER PROCEDURE getUserName
 @UserId INT
 AS
 SELECT UserName FROM Users WHERE UserId=@UserId;
+SELECT * FROM Critique
+
+CREATE OR ALTER PROCEDURE CreateCritique
+    @BookId INT,
+    @UserId INT,
+    @CritiqueDesc VARCHAR(MAX)
+AS
+BEGIN
+    DECLARE @CritiqueId INT; -- Declare the CritiqueId variable
+
+    INSERT INTO Critique
+    VALUES (@BookId, @UserId, @CritiqueDesc, GETDATE());
+
+    SET @CritiqueId = SCOPE_IDENTITY();
+
+    SELECT * FROM Critique WHERE CritiqueId = @CritiqueId;
+END;
+
+SELECT * FROM Users
+
+
+CREATE OR ALTER PROCEDURE DeleteMember
+    @CommunityId INT,
+    @UserId INT
+AS
+BEGIN
+    DECLARE @MemId INT;
+    SET @MemId = (SELECT CommunityMemberId FROM CommunityMembers WHERE UserId = @UserId);
+
+    DELETE FROM DiscussioReply WHERE CommunityMemberId = @MemId;
+    DELETE FROM CommunityDiscussion WHERE CommunityMemberId = @MemId;
+END;
+
+
+SELECT * FROM DiscussionReply
+SELECT * FROM CommunityDiscussion

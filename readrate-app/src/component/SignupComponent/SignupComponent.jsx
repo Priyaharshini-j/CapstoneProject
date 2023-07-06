@@ -1,7 +1,6 @@
 import axios from 'axios'
 import React, { useState } from 'react'
 import './SignupComponent.css'
-import LoginPage from '../../pages/LoginPage'
 import LoginComponent from '../LoginComponent/LoginComponent'
 
 export const SignupComponent = () => {

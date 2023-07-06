@@ -12,6 +12,7 @@ import DashboardPage from './pages/DashboardPage';
 import CommunityComponent from './component/CommunityComponent/CommunityComponent';
 import CritiqueComponent from './component/CritiqueComponent/CritiqueComponent';
 import PostComponent from './component/PostCompoent/PostComponent';
+import BookPage from './pages/BookPage';
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
   {
     path: '/post',
     element: <PostComponent />
+  },
+  {
+    path: '/book',
+    element: <BookPage />
   }
 ])
 

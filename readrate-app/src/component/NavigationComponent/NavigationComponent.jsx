@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import './NavigationComponent.css';
-import { Link, handleRouteChange } from 'react-router-dom';
-import { Menu, MenuItem, MenuList, MenuButton, IconButton, List, ListItem, Divider } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
+import { Menu, MenuItem, MenuList, MenuButton, IconButton} from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
-import { ListItemText } from '@mui/material';
 
 
 const NavigationComponent = () => {

@@ -128,19 +128,18 @@ namespace ReadRate.Controllers
         }
 
         [HttpPut, Route("[action]", Name = "EditProfile")]
-        public Models.Result UpdateProfile(UserModel userModel)
+        public Result UpdateProfile(UpdateModel userModel)
         {
-            Models.Result result = new Models.Result();
+            Result result = new Result();
             try
             {
-                if (userModel.UserName != null && userModel.UserEmail != null && userModel.Password != null && userModel.SecurityAns != null && userModel.SecurityQn != null)
-                {
+                int? convertedUserID = Context.HttpContext.Session.GetInt32("UserId");
+                int UserId = convertedUserID.HasValue ? convertedUserID.Value : 0;
 
-                    int? convertedUserID = Context.HttpContext.Session.GetInt32("UserId");
-                    int UserId = convertedUserID.HasValue ? convertedUserID.Value : 0;
-
-                    conn = new SqlConnection(_configuration["ConnectionStrings:SqlConn"]);
-                    conn.Open();
+                conn = new SqlConnection(_configuration["ConnectionStrings:SqlConn"]);
+                conn.Open();
+                if (userModel.UserName != "string" && userModel.UserEmail != "string" && userModel.Password != "string" && userModel.SecurityAns != "string" && userModel.SecurityQn != "string")
+                {                    
                     using (conn)
                     {
                         SqlCommand cmd = new SqlCommand("UpdateUser", conn);
@@ -161,9 +160,9 @@ namespace ReadRate.Controllers
                             result.result = false;
                             result.message = "Error in Updating the profile... Try Again";
                         }
-                    }
-                    conn.Close();
+                    }                    
                 }
+                conn.Close();
             }
             catch (Exception ex)
             {
@@ -215,8 +214,9 @@ namespace ReadRate.Controllers
         }
 
         [HttpGet , Route("[action]", Name = "FetchUserName")]
-        public signUpModel FetchUserName()
+        public string FetchUserName()
         {
+            string UserName = "";
             Console.WriteLine("inside the func");
             signUpModel signUpModel = new signUpModel();
             try
@@ -237,7 +237,7 @@ namespace ReadRate.Controllers
                     while(dr.Read())
                     {
                         Console.WriteLine("inside hte reading");
-                        signUpModel.UserName = dr["UserName"].ToString();
+                        UserName = dr["UserName"].ToString();
                         Console.WriteLine(signUpModel.UserName);
                     }
                 }
@@ -247,7 +247,7 @@ namespace ReadRate.Controllers
                 Console.WriteLine(ex.Message);
             }
             
-            return signUpModel;
+            return UserName;
         }
     }
 }

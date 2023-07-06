@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import MainLayout from '../layout/MainLayout';
-import { Rating, Typography } from '@mui/material';
+import { Rating, Typography, colors } from '@mui/material';
 import { Heading, Text } from '@chakra-ui/react';
 import '../component/BookComponent/BookComponent.css';
 import Box from '@mui/material/Box';
@@ -9,7 +9,12 @@ import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
-
+import CommunityComponent from '../component/CommunityComponent/CommunityComponent';
+import CritiqueComponent from '../component/CritiqueComponent/CritiqueComponent';
+import PostComponent from '../component/PostCompoent/PostComponent';
+import PeopleIcon from '@mui/icons-material/People';
+import ReviewsOutlinedIcon from '@mui/icons-material/ReviewsOutlined';
+import WallpaperOutlinedIcon from '@mui/icons-material/WallpaperOutlined';
 function BookPage(props) {
   const location = useLocation();
   console.log(props, 'props');
@@ -23,12 +28,13 @@ function BookPage(props) {
     coverImage: location.state?.coverImage,
     rating: location.state?.rating,
     genre: location.state?.genre,
-    desc: location.state?.desc
+    desc: location.state?.desc,
   }
   const [value, setValue] = React.useState('1');
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    
   };
 
   return (
@@ -56,21 +62,30 @@ function BookPage(props) {
             <Text py="2">{details.genre}</Text>
             {console.log(details.rating)}
             <Rating name="read-only" value={details.rating} size="small" readOnly />
-            <Typography variant="body2">Book Description: {details.desc}</Typography>
+            {console.log(details.desc)}
+            <Typography variant="body2">{details.desc}</Typography>
           </div>
         </div>
         <Box sx={{ width: '100%', typography: 'body1' }}>
           <TabContext value={value}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <TabList onChange={handleChange} aria-label="lab API tabs example">
-                <Tab label="Item One" value="1" />
-                <Tab label="Item Two" value="2" />
-                <Tab label="Item Three" value="3" />
+              <TabList onChange={handleChange} aria-label=" API tabs example"
+                textColor="secondary"
+                indicatorColor="secondary" centered >
+                <Tab icon={<PeopleIcon color='primary'/>} label="Community" value="1" />
+                <Tab icon={<ReviewsOutlinedIcon color='warning'/>} label="Critique" value="2" />
+                <Tab icon={<WallpaperOutlinedIcon color='info'/> } label="Post" value="3" />
               </TabList>
             </Box>
-            <TabPanel value="1">Item One</TabPanel>
-            <TabPanel value="2">Item Two</TabPanel>
-            <TabPanel value="3">Item Three</TabPanel>
+            <TabPanel value="1">
+              <CommunityComponent/>
+            </TabPanel>
+            <TabPanel value="2">
+              <CritiqueComponent />
+            </TabPanel>
+            <TabPanel value="3">
+              <PostComponent />
+            </TabPanel>
           </TabContext>
         </Box>
       </div>

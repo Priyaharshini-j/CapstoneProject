@@ -16,7 +16,7 @@ INSERT INTO Users ( UserName, UserEmail, Password, SecurityQn, SecurityAns, Crea
 VALUES
   ('John Doe', 'john.doe@example.com', 'password123', 'What is your favorite color?', 'Blue', GETDATE()),
   ('Jane Smith', 'jane.smith@example.com', 'abc123', 'What is your pet name?', 'Max', GETDATE()),
-  ('David Johnson', 'david.johnson@example.com', 'qwerty', 'What city were you born in?', 'New York', GETDATE());
+  ('David Johnson', 'david.johnson@example.com', 'qwerty', 'In what city were you born?', 'New York', GETDATE());
 
 
 --CREATING THE DATABASE FOR BOOK
@@ -25,7 +25,6 @@ CREATE TABLE Book
 BookId INT IDENTITY(1,1) PRIMARY KEY,
 ISBN VARCHAR(50) CONSTRAINT [Uk_ISBN] UNIQUE,
 BookName VARCHAR(225),
-BookVol VARCHAR(50),
 Genre VARCHAR(MAX) NOT NULL,
 Author VARCHAR(100),
 CoverUrl VARCHAR(MAX),
@@ -200,16 +199,17 @@ SELECT * FROM Community
 SELECT * FROM Book
 SELECT * FROM Users
 
-
-DROP TABLE PostLike;
-DROP TABLE Post
-DROP TABLE CritiqueLike
-DROP TABLE CritiqueReply
-DROP TABLE Critique
-DROP TABLE BookShelf
-DROP TABLE Rating
-DROP TABLE DiscussionReply
-DROP TABLE CommunityDiscussion
-DROP TABLE CommunityMembers
-DROP TABLE Community
-DROP TABLE Book
+--Drop TABle Following
+--DROP TABLE PostLike;
+--DROP TABLE Post
+--DROP TABLE CritiqueLike
+--DROP TABLE CritiqueReply
+--DROP TABLE Critique
+--DROP TABLE BookShelf
+--DROP TABLE Rating
+--DROP TABLE DiscussionReply
+--DROP TABLE CommunityDiscussion
+--DROP TABLE CommunityMembers
+--DROP TABLE Community
+--DROP TABLE Book
+--Drop TABLE Users

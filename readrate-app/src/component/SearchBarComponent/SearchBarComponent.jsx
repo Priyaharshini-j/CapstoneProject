@@ -7,8 +7,6 @@ import { CircularProgress, IconButton, Rating } from '@mui/material';
 import { AddShoppingCart } from '@mui/icons-material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Link, useNavigate } from 'react-router-dom';
-import ViewBook from '../ViewBook';
-import BookPage from '../../pages/BookPage';
 import BookComponent from '../BookComponent/BookComponent';
 
 

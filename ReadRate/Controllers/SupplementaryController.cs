@@ -20,7 +20,7 @@ namespace ReadRate.Controllers
             Context = context;
             UserId = Context.HttpContext.Session.GetInt32("UserId");
         }
-        public async Task<int> getBookIdByISBN(BookModel book)
+        public async Task<int> getBookIdByISBN(BookDetails book)
         {
             int bookId = 0;
             try
@@ -35,11 +35,12 @@ namespace ReadRate.Controllers
                         Console.WriteLine("Not Found");
                         try
                         {
+                            _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                            _conn.Open();
                             SqlCommand cmd = new SqlCommand("InsertBook", _conn);
                             cmd.CommandType = System.Data.CommandType.StoredProcedure;
                             cmd.Parameters.AddWithValue("@ISBN", book.ISBN);
                             cmd.Parameters.AddWithValue("@BookName", book.BookName);
-                            cmd.Parameters.AddWithValue("@BookVol", book.BookVol);
                             cmd.Parameters.AddWithValue("@Genre", book.Genre);
                             cmd.Parameters.AddWithValue("@Author", book.Author);
                             cmd.Parameters.AddWithValue("@CoverUrl", book.CoverUrl);
@@ -86,7 +87,6 @@ namespace ReadRate.Controllers
                             book.BookId = Convert.ToInt32(dr["BookId"]);
                             book.ISBN = dr["ISBN"].ToString();
                             book.BookName = dr["BookName"].ToString();
-                            book.BookVol = dr["BookVol"].ToString();
                             book.Genre = dr["Genre"].ToString();
                             book.Author = dr["Author"].ToString();
                             book.CoverUrl = dr["CoverUrl"].ToString();
@@ -313,10 +313,12 @@ namespace ReadRate.Controllers
             BookCommunity community = new BookCommunity();
             try
             {
+                Console.WriteLine("2");
                 _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
                 _conn.Open();
                 using (_conn)
                 {
+                    Console.WriteLine("2");
                     SqlCommand cmd = new SqlCommand("GetCommunitybyId", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@CommunityId", communityId);
@@ -325,6 +327,7 @@ namespace ReadRate.Controllers
                     adapter.Fill(dt);
                     if (dt != null && dt.Rows.Count > 0)
                     {
+                        Console.WriteLine("2");
                         Console.WriteLine("Found");
                         foreach (DataRow dr in dt.Rows)
                         {
@@ -336,8 +339,9 @@ namespace ReadRate.Controllers
                             community.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
                             community.result = new Models.Result();
                             community.result.result = true;
-                            community.result.message = "Community Created successfully";
+                            community.result.message = "Successfully retrieved the community";
                         }
+                        Console.WriteLine("2");
                     }
                     else
                     {
@@ -345,12 +349,14 @@ namespace ReadRate.Controllers
                         community.result.result = true;
                         community.result.message = "No community was created ";
                     }
+                    Console.WriteLine("2");
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
+            Console.WriteLine("2");
             return community;
         }
 

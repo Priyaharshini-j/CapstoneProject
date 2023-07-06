@@ -5,6 +5,7 @@
   box-shadow: 4px 4px 4px 4px aliceblue;
   border-radius: 5px;
   padding: 0px 30px;
+  align-items: center;
 }
 
 .image-container

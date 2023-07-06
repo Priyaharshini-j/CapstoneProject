@@ -24,7 +24,7 @@ namespace ReadRate.Controllers
         }
 
         [HttpPost, Route("[action]", Name = "BookCritique")]
-        public async Task<List<CritiqueModel>>CritiqueList(BookModel book)
+        public async Task<List<CritiqueModel>>CritiqueList(BookDetails book)
         {
             _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
             _conn.Open();

@@ -3,11 +3,14 @@ using System.Data.SqlClient;
 using ReadRate.Models;
 using System.Data;
 using System.Net;
+using Microsoft.AspNetCore.Cors;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace ReadRate.Controllers
 {
+
+    [EnableCors("AllowSpecificOrigin")]
     [Route("[controller]")]
     [ApiController]
     public class BookController : ControllerBase
@@ -26,7 +29,7 @@ namespace ReadRate.Controllers
         }
 
         [HttpPost, Route("[action]", Name = "BookCommunityList")]
-        public async Task<List<BookCommunity>> CommunityList(BookModel book)
+        public async Task<List<BookCommunity>> CommunityList(BookDetails book)
         {
             List<BookCommunity> communities = new List<BookCommunity>();
             int bookId = await supplementaryController.getBookIdByISBN(book); 
@@ -227,7 +230,6 @@ namespace ReadRate.Controllers
         }
 
         [HttpPost, Route("[action]", Name = "AddMember")]
-
         public Result AddMember(int CommunityId)
         {
             Models.Result results = new Models.Result();
@@ -270,17 +272,22 @@ namespace ReadRate.Controllers
                 using(_conn)
                 {
                     SqlCommand cmd = new SqlCommand("AddBookShelf", _conn);
+                    Console.WriteLine("1");
                     cmd.CommandType= CommandType.StoredProcedure;
                     int? userId = Context.HttpContext.Session.GetInt32("UserId");
                     int bookId = await supplementaryController.getBookIdByISBN(bookShelf.Book);
                     cmd.Parameters.AddWithValue("@UserId",userId);
                     cmd.Parameters.AddWithValue("@BookId", bookId);
                     cmd.Parameters.AddWithValue("@ReadingStatus", bookShelf.BookShelfName);
+                    Console.WriteLine("1");
                     cmd.ExecuteNonQuery();
+                    Console.WriteLine("1");
                     addingBook.result = true;
-                    addingBook.message = "Book Added to the Shelf" + bookShelf.BookShelfName;
+                    addingBook.message = "Book Added to the Shelf";
+                    Console.WriteLine("1");
 
                 }
+                _conn.Close();
 
             }
             catch (SqlException ex)
@@ -366,8 +373,54 @@ namespace ReadRate.Controllers
             return shelf;
         }
 
+        
+        [HttpPost, Route("[action]", Name ="EditCommunity")]
+        public Result EditCommunity(EditCommunity comm)
+        {
+           Result res = new Result();
+            try
+            {
+                Console.WriteLine("1");
+                int? userId = Context.HttpContext.Session.GetInt32("UserId");
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                Console.WriteLine("1");
+                if (userId == comm.CommunityAdmin)
+                {
+                    Console.WriteLine("1");
+                    using (_conn)
+                    {
+                        Console.WriteLine("1");
+                        SqlCommand cmd = new SqlCommand("EditCommunity", _conn);
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@CommunityId", comm.CommunityId);
+                        cmd.Parameters.AddWithValue("@CommunityName", comm.CommunityName);
+                        cmd.Parameters.AddWithValue("@CommunityDesc", comm.CommunityDesc);
+                        cmd.Parameters.AddWithValue("@CommunityAdmin", userId);
+                        cmd.Parameters.AddWithValue("@BookId", comm.BookId);
+                        Console.WriteLine("1");
+                        cmd.ExecuteNonQuery();
+                        res.result = true;
+                        res.message = "Updated the community";
+                    }
+                }
+                Console.WriteLine("1");
+
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("1");
+                res.result = false;
+                res.message = ex.Message;
+                Console.WriteLine(ex.ToString());
+                Console.WriteLine("1");
+            }
+            return res;
+        }
+
+
         [HttpDelete, Route("[action]", Name = "RemoveBook")]
-        public Result RemoveBook(BookInShelf bookInShelf)
+        public Result RemoveBook(DeleteBookInShelf bookInShelf)
         {
             Result result = new Result();
             int? userId = Context.HttpContext.Session.GetInt32("UserId");
@@ -380,9 +433,9 @@ namespace ReadRate.Controllers
                     SqlCommand cmd = new SqlCommand("RemoveBook", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@BookShelfId", bookInShelf.BookShelfId);
-                    cmd.Parameters.AddWithValue("@UserId", bookInShelf.UserId);
-                    cmd.Parameters.AddWithValue("@BookId", bookInShelf.Book.BookId);
-                    cmd.Parameters.AddWithValue("@ReadingStatus", bookInShelf.BookShelfName);
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@BookId", bookInShelf.BookId);
+                    cmd.Parameters.AddWithValue("@ReadingStatus", bookInShelf.ReadingStatus);
                     cmd.ExecuteNonQuery();
                     result.result = true;
                     result.message = "Successfully removed the book from the shelf";
@@ -397,42 +450,7 @@ namespace ReadRate.Controllers
             return result;
         }
 
-        [HttpPut, Route("[action]", Name ="EditCommunity")]
-        public BookCommunity EditCommunity(BookCommunity comm)
-        {
-            BookCommunity editedCommunity = new BookCommunity();
-            try
-            {
-                int? userId = Context.HttpContext.Session.GetInt32("UserId");
-                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
-                _conn.Open();
-                if(userId == comm.CommunityAdmin)
-                {
-                    using (_conn)
-                    {
-                        SqlCommand cmd = new SqlCommand("EditCommunity", _conn);
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.AddWithValue("@CommunityId", comm.CommunityId);
-                        cmd.Parameters.AddWithValue("@CommunityName", comm.CommunityName);
-                        cmd.Parameters.AddWithValue("@CommunityDesc", comm.CommunityDesc);
-                        cmd.Parameters.AddWithValue("@CommunityAdmin", userId);
-                        cmd.Parameters.AddWithValue("@BookId", comm.BookId);
-                        cmd.ExecuteNonQuery();
-                        editedCommunity = supplementaryController.GetCommunitybyId(comm.CommunityId);
-                        editedCommunity.result.result = true;
-                        editedCommunity.result.message = "Successfully removed the book from the shelf";
-                    }
-                }
-               
-            }
-            catch(Exception ex)
-            {
-                editedCommunity.result.result = false;
-                editedCommunity.result.message = ex.Message;
-                Console.WriteLine(ex.ToString());
-            }
-            return editedCommunity;
-        }
+        
 
 
 

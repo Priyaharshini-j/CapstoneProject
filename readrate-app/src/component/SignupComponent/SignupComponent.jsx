@@ -95,10 +95,11 @@ export const SignupComponent = () => {
             >
               <option value="" disabled selected>Select a security question</option>
               <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
-              <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+              <option value="What is your pet name?">What is your pet name?</option>
               <option value="What is your favorite book?">What is your favorite book?</option>
               <option value="In what city were you born?">In what city were you born?</option>
               <option value="What is the name of your best friend?">What is the name of your best friend?</option>
+              <option value="What is your favorite color?">What is your favorite color?</option>
             </select>
             <label className="label-body">Security Answer:</label>
             <input

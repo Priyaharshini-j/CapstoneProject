@@ -19,4 +19,13 @@
         public string ISBN { get; set; }
 
     }
+
+    public class EditCommunity
+    {
+        public string CommunityName { get; set; }
+        public string CommunityDesc { get; set; }
+        public int CommunityAdmin { get; set; }
+        public int CommunityId { get; set; }
+        public int BookId { get; set; }
+    }
 }

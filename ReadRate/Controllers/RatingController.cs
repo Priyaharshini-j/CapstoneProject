@@ -23,7 +23,7 @@ namespace ReadRate.Controllers
         }
 
         [HttpPost, Route("[action]", Name = "GetRatingsForBook")]
-        public async Task<float> GetRating(BookModel book)
+        public async Task<float> GetRating(BookDetails book)
         {
             float rating = 0.0f;
             _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
@@ -114,7 +114,6 @@ namespace ReadRate.Controllers
                     rating.BookDetail.BookId = Convert.ToInt32(dr["BookId"]);
                     rating.BookDetail.BookName = dr["BookName"].ToString();
                     rating.BookDetail.ISBN = dr["ISBN"].ToString();
-                    rating.BookDetail.BookVol = dr["BookVol"].ToString();
                     rating.BookDetail.Genre = dr["Genre"].ToString();
                     rating.BookDetail.Author = dr["Author"].ToString();
                     rating.BookDetail.Publisher = dr["Publisher"].ToString();

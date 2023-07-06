@@ -22,7 +22,7 @@ namespace ReadRate.Controllers
             Context = _context;
         }
         [HttpPost, Route("[action]", Name = "GetPostByBookId")]
-        public async Task<List<PostModel>> GetPosts(BookModel book)
+        public async Task<List<PostModel>> GetPosts(BookDetails book)
         {
             _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
             _conn.Open();

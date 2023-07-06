@@ -24,16 +24,7 @@ SELECT * FROM Critique WHERE UserId=@UserId;
 --Critic->CritiqueReply
 --Critic->CritiqueLike
 --Post->PostLike
-CREATE OR ALTER PROCEDURE DeleteUser
-@UserId INT,
-@Memid INT OUTPUT
-AS
-BEGIN
-SET @memid = SELECT UserId from CommunityMembers WHERE UserId=UserId
-DELETE FROM DiscussionReply WHERE Member=@UserId;
-DELETE FROM CommunityDiscussion WHERE UserId=@UserId;
-S
-END;
+
 
 
 --Creating the procedure to Creating a user profile
@@ -46,7 +37,7 @@ CREATE OR ALTER PROCEDURE CreateUser
 AS
 BEGIN
 INSERT INTO USERS 
-VALUES (@UserName, @UserEmail, @Password,@SecurityQn, @SecurityQn,GETDATE());
+VALUES (@UserName, @UserEmail, @Password,@SecurityQn, @SecurityAns,GETDATE());
 END
 
 --Creating Procedure to update the profile
@@ -87,19 +78,29 @@ END;
 CREATE OR ALTER PROCEDURE InsertBook
     @ISBN VARCHAR(50),
     @BookName VARCHAR(225),
-    @BookVol VARCHAR(50),
     @Genre VARCHAR(MAX),
     @Author VARCHAR(100),
     @CoverUrl VARCHAR(MAX),
     @bookDesc VARCHAR(MAX),
     @Publisher VARCHAR(200),
-    @PublishedDate DATETIME,
-    @BookId INT OUTPUT
+    @PublishedDate DATETIME
 AS
 BEGIN
-    INSERT INTO Book (ISBN, BookName, BookVol, Genre, Author, CoverUrl, BookDesc, Publisher, PublishedDate)
-    VALUES (@ISBN, @BookName, @BookVol, @Genre, @Author, @CoverUrl, @bookDesc, @Publisher, @PublishedDate)
+    INSERT INTO Book (ISBN, BookName, Genre, Author, CoverUrl, BookDesc, Publisher, PublishedDate)
+    VALUES (@ISBN, @BookName, @Genre, @Author, @CoverUrl, @bookDesc, @Publisher, @PublishedDate)
 END;
+
+SELECT * FROM BookShelf
+
+CREATE OR ALTER PROCEDURE ListBookInShelf
+@UserId INT
+AS
+SELECT * FROM BookShelf WHERE UserId=@UserId;
+
+CREATE OR ALTER PROCEDURE GetBookByBookId
+@BookId INT
+AS
+SELECT * FROM Book WHERE BookId=@BookId
 
 --Creating the procedure to retrive the community by BookId
 
@@ -490,3 +491,48 @@ END;
 
 SELECT * FROM DiscussionReply
 SELECT * FROM CommunityDiscussion
+SELECT * FROM CommunityMembers
+SELECT * FROM Community
+
+
+
+CREATE OR ALTER PROCEDURE DeleteUser
+(
+  @UserId INT
+)
+AS
+BEGIN
+
+  -- Delete the user from the Users table.
+  DELETE FROM Users
+  WHERE UserId = @UserId;
+
+  -- Delete the user from any related tables.
+  DELETE FROM Post
+  WHERE UserId = @UserId;
+  DELETE FROM Critique
+  WHERE UserId = @UserId;
+  DELETE FROM Rating
+  WHERE UserId = @UserId;
+  DELETE FROM BookShelf
+  WHERE UserId = @UserId;
+  DELETE FROM CommunityMembers
+  WHERE UserId = @UserId;
+  DELETE FROM CommunityDiscussion
+  WHERE CommunityMemberId = @UserId;
+  DELETE FROM DiscussionReply
+  WHERE CommunityMemberId = @UserId;
+  DELETE FROM CritiqueReply
+  WHERE UserId = @UserId;
+  DELETE FROM CritiqueLike
+  WHERE UserId = @UserId;
+  DELETE FROM PostLike
+  WHERE UserId = @UserId;
+  DELETE FROM Following
+  WHERE UserId = @UserId;
+
+END;
+
+
+
+SELECT * FROM Book

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ReadRate.Models;
 using System.Data;
@@ -7,6 +8,8 @@ using System.Net;
 
 namespace ReadRate.Controllers
 {
+
+    [EnableCors("AllowSpecificOrigin")]
     [Route("api/[controller]")]
     [ApiController]
     public class CritiqueController : ControllerBase
@@ -117,9 +120,9 @@ namespace ReadRate.Controllers
                         UserCritique critique = new UserCritique();
                         critique.result = new Models.Result();
                         critique.result.result = true;
-                        critique.result.message = "No Critique found for this book";
+                        critique.result.message = "No Critique found for this user";
                         critiqueList.Add(critique);
-                        Console.WriteLine("No Critique found for this book");
+                        Console.WriteLine("No Critique found for this user");
                     }
 
                 }
@@ -136,7 +139,7 @@ namespace ReadRate.Controllers
         }
 
         [HttpPost, Route("[action]", Name = "CreatingCritique")]
-        public UserCritique CreatingCritique(CritiqueModel critiqueModel)
+        public UserCritique CreatingCritique(CreatingCritique critiqueModel)
         {
             UserCritique critique = new UserCritique();
             int? UserId = Context.HttpContext.Session.GetInt32("UserId");
@@ -184,25 +187,38 @@ namespace ReadRate.Controllers
             }
             return critique;
         }
-
+        /*
         [HttpDelete, Route("[action]", Name ="DeleteCritique")]
         public Result DeleteCritique(int critiqueId)
         {
             Result result = new Result();
-            try
-            {
                 int? UserId = Context.HttpContext.Session.GetInt32("UserId");
-                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
-                _conn.Open();
-                using (_conn)
+                try
                 {
-                    SqlCommand cmd = new SqlCommand("DeleteCritique",_conn);
+                    _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                    _conn.Open();
+                    using (_conn)
+                    {
+                    Console.WriteLine("3");
+                    SqlCommand cmd = new SqlCommand("DeleteCritique", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@CritiqueId", critiqueId);
                     cmd.Parameters.AddWithValue("@UserId", UserId);
-                    cmd.ExecuteNonQuery();
-                    result.result = true;
-                    result.message = "Successfully Deleted Critique ";
+                    Console.WriteLine("3");
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    Console.WriteLine("3");
+                    if (rowsAffected > 0)
+                    {
+                        result.result = true;
+                        result.message = "Successfully deleted critique.";
+                    }
+                    else
+                    {
+                        result.result = false;
+                        result.message = "Failed to delete critique.";
+                    }
+                    Console.WriteLine("3");
+
                 }
             }
             catch (Exception ex)
@@ -212,9 +228,9 @@ namespace ReadRate.Controllers
             }
             return result;
         }
-
-        [HttpPost, Route("[action]", Name ="CreatingCritiqueReply")]
-        public CritiqueWithReply CreatingCritiqueReply(CritiqueReply critiqueReply)
+        */
+        [HttpPost, Route("[action]", Name = "CreatingCritiqueReply")]
+        public CritiqueWithReply CreatingCritiqueReply(CreateCritiqueReply critiqueReply)
         {
             CritiqueWithReply critiqueWithReply = new CritiqueWithReply();
             try
@@ -226,9 +242,10 @@ namespace ReadRate.Controllers
                 {
                     SqlCommand cmd = new SqlCommand("CreateCritiqueReply", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@CritiqueId",critiqueReply.CritiqueId);
+                    cmd.Parameters.AddWithValue("@CritiqueId", critiqueReply.CritiqueId);
                     cmd.Parameters.AddWithValue("@UserId", UserId);
                     cmd.Parameters.AddWithValue("@Reply", critiqueReply.Reply);
+                    critiqueWithReply.critique = new UserCritique();
                     critiqueWithReply.critique = supplementaryController.GetCritiqueById(critiqueReply.CritiqueId);
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
@@ -236,27 +253,31 @@ namespace ReadRate.Controllers
                     if (dt != null && dt.Rows.Count > 0)
                     {
                         Console.WriteLine("Found");
+                        critiqueWithReply.reply = new List<CritiqueReply>(); // Initialize the reply list
                         foreach (DataRow dr in dt.Rows)
                         {
+
                             CritiqueReply criReply = new CritiqueReply();
                             criReply.CritiqueReplyId = (int)dr["CritiqueReplyId"];
                             criReply.CritiqueId = Convert.ToInt32(dr["CritiqueId"]);
                             criReply.UserId = Convert.ToInt32(dr["UserId"]);
                             criReply.Reply = dr["Reply"].ToString();
                             criReply.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
-                            critiqueWithReply.reply.Add(critiqueReply);
+                            critiqueWithReply.reply.Add(criReply);
                         }
                     }
                     else
                     {
+                        critiqueWithReply.Result = new Models.Result();
                         critiqueWithReply.Result.result = true;
                         critiqueWithReply.Result.message = "Critique reply was not added";
                         Console.WriteLine("Critique reply was not added");
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
+                critiqueWithReply.Result = new Models.Result();
                 critiqueWithReply.Result.result = false;
                 critiqueWithReply.Result.message = ex.Message;
                 Console.WriteLine(ex.Message);
@@ -264,6 +285,7 @@ namespace ReadRate.Controllers
             return critiqueWithReply;
         }
 
+        /*
         [HttpPost, Route("[action]", Name = "GetCritiqueReply")]
         public CritiqueWithReply GetCritiqueAndReply(int critiqueId)
         {
@@ -282,9 +304,9 @@ namespace ReadRate.Controllers
             }
             return critiqueWithReply;
         }
-
+        */
         [HttpPost, Route("[action]", Name ="CritiqueLikeDislike")]
-        public Result LikeDislikeCritique(int critiqueId, int LikeStatus )
+        public Result LikeDislikeCritique(CritiqueLikeDislike critiqueLikeDislike )
         {
             Result result = new Result();
             try
@@ -296,9 +318,9 @@ namespace ReadRate.Controllers
                 {
                     SqlCommand cmd = new SqlCommand("LikeDislikeCritique", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@CritiqueId", critiqueId);
+                    cmd.Parameters.AddWithValue("@CritiqueId", critiqueLikeDislike.critiqueId);
                     cmd.Parameters.AddWithValue("@UserId", UserId);
-                    cmd.Parameters.AddWithValue("@LikeStatus", LikeStatus);
+                    cmd.Parameters.AddWithValue("@LikeStatus", critiqueLikeDislike.LikeStatus);
                     cmd.ExecuteNonQuery();
                     result.result = true;
                     result.message = "Liked a Critique";
@@ -313,7 +335,7 @@ namespace ReadRate.Controllers
         }
 
         [HttpPut, Route("[action]", Name = "EditCritique")]
-        public UserCritique EditCritique(CritiqueModel critiqueModel)
+        public UserCritique EditCritique(EditCritiqueDesc critiqueModel)
         {
             int? UserId = Context.HttpContext.Session.GetInt32("UserId");
             UserCritique editedCritique = new UserCritique();
@@ -364,9 +386,9 @@ namespace ReadRate.Controllers
         }
 
         [HttpPut, Route("[action]", Name = "EditedCritiqueReply")]
-        public CritiqueWithReply EditedCritiqueReply(CritiqueReply reply)
+        public Result EditedCritiqueReply(EditCritiqueReply reply)
         {
-            CritiqueWithReply editedCritique = new CritiqueWithReply();
+            Result result = new Result();
             try
             {
                 int? UserId = Context.HttpContext.Session.GetInt32("UserId");
@@ -381,17 +403,16 @@ namespace ReadRate.Controllers
                     cmd.Parameters.AddWithValue("@CritiqueId", reply.CritiqueId);
                     cmd.Parameters.AddWithValue("@Reply", reply.Reply);
                     cmd.ExecuteNonQuery();
-                    editedCritique.critique = supplementaryController.GetCritiqueById(reply.CritiqueId);
-                    editedCritique.reply = supplementaryController.GetCritiqueReplyById(reply.CritiqueId);
-                    editedCritique.Result.result = true;
+                    result.result = true;
+                    result.message = "Reply edited successfully";
                 }
             }
             catch(Exception ex)
             {
-                editedCritique.Result.result= false;
-                editedCritique.Result.message = ex.Message;
+               result.result= false;
+               result.message = ex.Message;
             }
-            return editedCritique;
+            return result;
         }
 
 

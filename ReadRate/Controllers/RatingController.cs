@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ReadRate.Models;
 using System.Data;
@@ -7,6 +8,7 @@ using System.Net;
 
 namespace ReadRate.Controllers
 {
+    [EnableCors("AllowSpecificOrigin")]
     [Route("api/[controller]")]
     [ApiController]
     public class RatingController : ControllerBase
@@ -59,12 +61,14 @@ namespace ReadRate.Controllers
         {
             _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
             _conn.Open();
+
+            int? userId = Context.HttpContext.Session.GetInt32("UserId");
             List<UserRatingModel> ratings = new List<UserRatingModel>();
             try
             {
                 SqlCommand cmd = new SqlCommand("getUsersRating", _conn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@UserId", Context.HttpContext.Session.GetInt32("UserId"));
+                cmd.Parameters.AddWithValue("@UserId", userId);
                 SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 adapter.Fill(dt);
@@ -91,25 +95,23 @@ namespace ReadRate.Controllers
         }
 
         [HttpPost, Route("[action]", Name = "AddRating")]
-        public async Task<UserRating> AddRating(string ISBN, int userRatings)
+        public async Task<UserRating> AddRating(AddRatingModel ratingModel)
         {
             UserRating rating = new UserRating();
             try
             {
                 _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
                 _conn.Open();
-                Context.HttpContext.Session.SetInt32("UserId", 1);
-                int? userId = Context.HttpContext.Session.GetInt32("UserId");
-                int bookId = supplementaryController.GetBookId(ISBN);
+                int bookId = supplementaryController.GetBookId(ratingModel.ISBN);
                 SqlCommand cmd = new SqlCommand("AddRating", _conn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@userRatings", userRatings);
-                cmd.Parameters.AddWithValue("@UserId", userId);
+                cmd.Parameters.AddWithValue("@userRatings", ratingModel.Rating);
+                cmd.Parameters.AddWithValue("@UserId", ratingModel.userId);
                 cmd.Parameters.AddWithValue("@BookId", bookId);
-                SqlDataReader dr = await cmd.ExecuteReaderAsync();
+                using SqlDataReader dr = await cmd.ExecuteReaderAsync();
                 if (dr.Read())
                 {
-                    rating.userRating = userRatings;
+                    rating.userRating = ratingModel.Rating;
                     rating.BookDetail = new BookModel();
                     rating.BookDetail.BookId = Convert.ToInt32(dr["BookId"]);
                     rating.BookDetail.BookName = dr["BookName"].ToString();
@@ -122,20 +124,23 @@ namespace ReadRate.Controllers
                     rating.BookDetail.BookDesc = dr["BookDesc"].ToString();
                     rating.result = new Result();
                     rating.result.result = true;
-                    rating.result.message = "Rating created Successfully";
-
+                    rating.result.message = "Rating created successfully";
                 }
-                
             }
             catch (SqlException ex)
             {
                 rating.result = new Result();
                 rating.result.result = false;
-                rating.result.message = "Rating is still not created... Error!";
+                rating.result.message = "Rating creation failed";
                 Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                _conn.Close();
             }
             return rating;
         }
+
 
         [HttpDelete, Route("[action]" , Name ="DeleteRating")]
         public Result DeleteRating(int BookId)

@@ -22,4 +22,31 @@
         public int Dislike { get; set; }
         public Result result { get; set; }
     }
+
+    public class CreatingCritique
+    {
+        public int BookId { get; set; }
+        public string CritiqueDesc { get; set; }
+    }
+
+    public class CritiqueLikeDislike
+    {
+        public int critiqueId { get; set; }
+        public int LikeStatus { get; set; }
+
+    }
+    public class EditCritiqueDesc
+    {
+        public int CritiqueId { get; set; }
+        public string CritiqueDesc { get; set; }
+        public int BookId { get; set; }
+    }
+
+    public class EditCritiqueReply
+    {
+        public int CritiqueReplyId {  get; set; }
+        public int CritiqueId { get; set; }
+        public string Reply { get; set; }
+    }
 }
+

@@ -27,4 +27,12 @@
         public int userRating { get; set; }
         public Result result { get; set; }
     }
+
+    public class AddRatingModel
+    {
+
+        public string ISBN { get; set; }
+        public int userId { get; set; }
+        public int Rating { get; set; }
+    }
 }

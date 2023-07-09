@@ -29,9 +29,9 @@ namespace ReadRate.Controllers
         }
 
         [HttpPost, Route("[action]", Name = "BookCommunityList")]
-        public async Task<List<BookCommunity>> CommunityList(BookDetails book)
+        public async Task<List<CommunityList>> CommunityList(BookDetails book)
         {
-            List<BookCommunity> communities = new List<BookCommunity>();
+            List<CommunityList> communities = new List<CommunityList>();
             int bookId = await supplementaryController.getBookIdByISBN(book); 
             try
             {
@@ -50,20 +50,21 @@ namespace ReadRate.Controllers
                         Console.WriteLine("Found");
                         foreach (DataRow dr in dt.Rows)
                         {
-                            BookCommunity community = new BookCommunity();
+                            CommunityList community = new CommunityList();
                             community.CommunityId = Convert.ToInt32(dr["CommunityId"]);
                             community.CommunityName = dr["CommunityName"].ToString();
                             community.CommunityDesc = dr["CommunityDesc"].ToString();
-                            community.CommunityAdmin = Convert.ToInt32(dr["CommunityAdmin"]);
+                            community.CommunityAdmin = supplementaryController.FetchNameById(Convert.ToInt32(dr["CommunityAdmin"]));
                             community.BookId = Convert.ToInt32(dr["BookId"]);
                             community.CommunityMembers = supplementaryController.NoOfCommMembers(community.CommunityId);
-                            community.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                            community.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]).Date;
+
                             communities.Add(community);
                         }
                     }
                     else
                     {
-                        BookCommunity comm = new BookCommunity();
+                        CommunityList comm = new CommunityList();
                         comm.result = new Models.Result();
                         comm.result.result = true;
                         comm.result.message = "No Communities found";
@@ -74,7 +75,7 @@ namespace ReadRate.Controllers
             }
             catch (SqlException ex)
             {
-                BookCommunity comm = new BookCommunity();
+                CommunityList comm = new CommunityList();
                 comm.result = new Models.Result();
                 comm.result.result = false;
                 comm.result.message =ex.Message;
@@ -232,34 +233,47 @@ namespace ReadRate.Controllers
         [HttpPost, Route("[action]", Name = "AddMember")]
         public Result AddMember(int CommunityId)
         {
-            Models.Result results = new Models.Result();
+            Result results = new Result();
             try
             {
-                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
-                _conn.Open();
                 using (_conn)
                 {
+                    _conn.Open();
+
+                    // Check if the CommunityId exists in the Community table
+                    SqlCommand checkCmd = new SqlCommand("SELECT COUNT(*) FROM Community WHERE CommunityId = @CommunityId", _conn);
+                    checkCmd.Parameters.AddWithValue("@CommunityId", CommunityId);
+                    int communityCount = (int)checkCmd.ExecuteScalar();
+                    Console.WriteLine(communityCount);
+                    if (communityCount == 0)
+                    {
+                        results.result = false;
+                        results.message = "Invalid CommunityId";
+                        return results;
+                    }
+
                     SqlCommand cmd = new SqlCommand("AddMember", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    //Context.HttpContext.Session.SetInt32("UserId", 1);
                     int? userId = Context.HttpContext.Session.GetInt32("UserId");
                     int convertedUserId = userId.HasValue ? userId.Value : 0;
                     cmd.Parameters.AddWithValue("@UserId", convertedUserId);
                     cmd.Parameters.AddWithValue("@CommunityId", CommunityId);
                     cmd.ExecuteNonQuery();
+
                     results.result = true;
-                    results.message = "You are added as a Member ";
+                    results.message = "You have been added as a member";
                 }
-                _conn.Close();
             }
             catch (SqlException ex)
             {
                 results.result = false;
                 results.message = ex.Message;
-                Console.WriteLine(ex.Message);
             }
+                _conn.Close();
+
             return results;
         }
+
 
         [HttpPost, Route("[action]" , Name ="AddToShelf")]
         public async Task<Result> AddingBook (AddBookShelf bookShelf)
@@ -298,7 +312,7 @@ namespace ReadRate.Controllers
             }
             return addingBook;
         }
-
+        /*
         [HttpDelete, Route("[action]", Name = "DeleteMember")]
         public Result DeletingMember (BookCommunity community)
         {
@@ -326,7 +340,7 @@ namespace ReadRate.Controllers
             }
             return result;
         }
-
+        */
         [HttpGet, Route("[action]", Name = "BookInShelf")]
         public List<BookInShelf> ListBookInShelf()
         {

@@ -25,7 +25,7 @@ namespace ReadRate.Controllers
             _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
             _conn.Open();
         }
-        [HttpGet, Route("[action]", Name ="ListDiscussion")]
+        [HttpGet, Route("[action]", Name = "ListDiscussion")]
         public DiscussionList GetDiscussionList(int communityId)
         {
             DiscussionList discussionList = new DiscussionList();
@@ -42,6 +42,8 @@ namespace ReadRate.Controllers
                     if (dt != null && dt.Rows.Count > 0)
                     {
                         Console.WriteLine("Found");
+                        discussionList.Discussions = new List<CommunityDiscussion>(); // Initialize the Discussions list
+                        discussionList.UserName = new List<string>(); // Initialize the UserName list
                         foreach (DataRow dr in dt.Rows)
                         {
                             CommunityDiscussion communityDiscussion = new CommunityDiscussion();
@@ -53,18 +55,21 @@ namespace ReadRate.Controllers
                             discussionList.UserName.Add(supplementaryController.GetUserNameByMemberId(communityDiscussion.CommunityMemberId));
                         }
                     }
+                    discussionList.result = new Models.Result(); // Create a new instance of Result object
                     discussionList.result.result = true;
                     discussionList.result.message = "List of discussions";
                 }
             }
             catch (Exception ex)
             {
+                discussionList.result = new Models.Result(); // Create a new instance of Result object
                 discussionList.result.result = false;
                 discussionList.result.message = ex.Message;
                 Console.WriteLine(ex.Message);
             }
             return discussionList;
         }
+
         [HttpGet, Route("[action]", Name ="ListDiscussionReply")]
         public ListDiscussionReply GetDiscussionReply(int discussionId)
         {
@@ -138,38 +143,45 @@ namespace ReadRate.Controllers
             return result;
         }
 
-        [HttpPost, Route("[action]", Name ="CreateDiscussion")]
-        public DiscussionList CreateDiscussion(CommunityDiscussion communityDiscussion)
+        [HttpPost, Route("[action]", Name = "CreateDiscussion")]
+        public Result CreateDiscussion(CommunityDiscussion communityDiscussion)
         {
-            DiscussionList discussionList = new DiscussionList();
+            Result res = new Result();
             try
             {
-                using (_conn)
+                using (SqlConnection _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]))
                 {
-                    SqlCommand cmd = new SqlCommand("CreateDiscussion", _conn);
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("CommunityId", communityDiscussion.CommunityId);
-                    cmd.Parameters.AddWithValue("CommunityMemberId", supplementaryController.GetMemberId(communityDiscussion.CommunityId));
-                    cmd.Parameters.AddWithValue("Discussion", communityDiscussion.Discussion);
-                    cmd.ExecuteNonQuery();
-                    discussionList.result.result = true;
-                    discussionList.result.message = "Successful in creation";
-                    discussionList = supplementaryController.GetListDiscussion(communityDiscussion.CommunityId);
+                    _conn.Open();
+                    using (SqlCommand cmd = new SqlCommand("CreateDiscussion", _conn))
+                    {
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("CommunityId", communityDiscussion.CommunityId);
+                        int memId = supplementaryController.GetMemberId(communityDiscussion.CommunityId);
+                        Console.WriteLine(memId);
+
+                        cmd.Parameters.AddWithValue("CommunityMemberId", memId);
+                        cmd.Parameters.AddWithValue("Discussion", communityDiscussion.Discussion);
+                        cmd.ExecuteNonQuery();
+                        res.result = true;
+                        res.message = "Successful in creation";
+                    }
                 }
             }
-            catch(SqlException ex)
+            catch (SqlException ex)
             {
-                discussionList.result.result = false;
-                discussionList.result.message = ex.Message;
+                res.result = false;
+                res.message = ex.Message;
             }
-            return discussionList;
+            return res;
         }
+
         [HttpPost, Route("[action]", Name = "CreateDiscussionReply")]
         public ListDiscussionReply CreateDiscussionReply(DiscussionReply discussionReply)
         {
             ListDiscussionReply listDiscussionReply = new ListDiscussionReply();
             try
             {
+                _conn.Open();
                 using (_conn)
                 {
                     SqlCommand cmd = new SqlCommand("CreateDiscussionReply", _conn);

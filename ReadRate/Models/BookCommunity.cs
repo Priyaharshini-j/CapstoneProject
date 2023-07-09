@@ -28,4 +28,16 @@
         public int CommunityId { get; set; }
         public int BookId { get; set; }
     }
+
+    public class CommunityList
+    {
+        public int CommunityId { get; set; }
+        public string CommunityName { get; set; }
+        public string CommunityDesc { get; set; }
+        public string CommunityAdmin { get; set; }
+        public int BookId { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public virtual int CommunityMembers { get; set; }
+        public Result result { get; set; }
+    }
 }

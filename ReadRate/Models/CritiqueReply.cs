@@ -17,4 +17,11 @@
         public List<CritiqueReply> reply { get; set; }
         public Result Result { get; set; }
     }
+
+    public class CreateCritiqueReply
+    {
+        public int CritiqueId { get; set; }
+
+        public string Reply { get; set; }
+    }
 }

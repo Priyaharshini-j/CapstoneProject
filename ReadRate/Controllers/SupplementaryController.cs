@@ -548,41 +548,45 @@ namespace ReadRate.Controllers
                             discussionList.UserName.Add(GetUserNameByMemberId(communityDiscussion.CommunityMemberId));
                         }
                     }
+                    discussionList.result = new Result();
                     discussionList.result.result = true;
                     discussionList.result.message = "List of discussions";
                 }
             }
             catch (Exception ex)
             {
+
+                discussionList.result = new Result();
                 discussionList.result.result = false;
                 discussionList.result.message = ex.Message;
                 Console.WriteLine(ex.Message);
             }
             return discussionList;
         }
-
         public int GetMemberId(int communityId)
         {
             int memberId = 0;
             try
             {
-                using(_conn)
+                using (SqlConnection _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]))
                 {
-
-                    SqlCommand cmd = new SqlCommand("GetMemberId", _conn);
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@UserId", UserId);
-                    cmd.Parameters.AddWithValue("@CommunityId", communityId);
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    while(dr.Read())
+                    _conn.Open();
+                    using (SqlCommand cmd = new SqlCommand("GetMemberId", _conn))
                     {
-                        memberId = Convert.ToInt32(dr["UserId"]);
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@UserId", UserId);
+                        cmd.Parameters.AddWithValue("@CommunityId", communityId);
+                        SqlDataReader dr = cmd.ExecuteReader();
+                        while (dr.Read())
+                        {
+                            memberId = Convert.ToInt32(dr["UserId"]);
+                        }
                     }
                 }
             }
-            catch(SqlException ex) 
-            { 
-                memberId=0;
+            catch (SqlException ex)
+            {
+                memberId = 0;
                 Console.WriteLine(ex.Message);
             }
             return memberId;
@@ -633,6 +637,40 @@ namespace ReadRate.Controllers
                 Console.WriteLine(ex.Message);
             }
             return listDiscussionReply;
+        }
+
+        public string FetchNameById(int userId)
+        {
+            string UserName = "";
+            Console.WriteLine("inside the func");
+            signUpModel signUpModel = new signUpModel();
+            try
+            {
+                Console.WriteLine("inisde he try");
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using (_conn)
+                {
+                    Console.WriteLine("inside hte using");
+                    Console.WriteLine(UserId);
+                    SqlCommand cmd = new SqlCommand("getUserName", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    SqlDataReader dr = cmd.ExecuteReader();
+                    while (dr.Read())
+                    {
+                        Console.WriteLine("inside hte reading");
+                        UserName = dr["UserName"].ToString();
+                        Console.WriteLine(signUpModel.UserName);
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            return UserName;
         }
     }
 

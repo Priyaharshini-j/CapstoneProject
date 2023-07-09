@@ -100,11 +100,20 @@ function BookPage(props) {
                 <Fab variant='extended' color='warning'><GroupAdd /> &nbsp;Create Community</Fab>
                 <Fab variant='extended' color='info'><Edit />&nbsp; Write Critique</Fab>
                 <Fab variant='extended' color='secondary'> <PostAdd /> Share a Post</Fab>
+              </div>
+              <div>
+                <br />
+                Add Your Rating:
+                <br />
                 <Rating
                   name="simple-controlled"
                   value={rate}
-                  onChange={handleRate} size="large"
+                  onChange={handleRate}
+                  size="large"
+                  align="center"
+                  justifyContent="center"
                 />
+
               </div>
             </div>
           </div>
@@ -124,7 +133,7 @@ function BookPage(props) {
               <CommunityComponent state={{ bookIsbn: details.isbn, title: details.title, author: details.author, publisher: details.publisher, publishedDate: details.publishedDate, buyLink: details.buyLink, coverImage: details.coverImage, rating: details.rating, genre: details.genre, desc: details.desc }} />
             </TabPanel>
             <TabPanel value="2">
-              <CritiqueComponent />
+              <CritiqueComponent state={{ bookIsbn: details.isbn, title: details.title, author: details.author, publisher: details.publisher, publishedDate: details.publishedDate, buyLink: details.buyLink, coverImage: details.coverImage, rating: details.rating, genre: details.genre, desc: details.desc }}/>
             </TabPanel>
             <TabPanel value="3">
               <PostComponent />

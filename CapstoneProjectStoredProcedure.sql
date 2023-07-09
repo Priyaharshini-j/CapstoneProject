@@ -310,13 +310,6 @@ SET @CritiqueId = SCOPE_IDENTITY();
 SELECT * FROM Critique WHERE CritiqueId=@CritiqueId;
 END;
 
-CREATE OR ALTER PROCEDURE DeleteCritique
-@CritiqueId INT,
-@UserId INT
-AS
-BEGIN
-DELETE FROM Critique WHERE CritiqueId= @CritiqueId AND UserId = @UserId;
-END;
 
 CREATE OR ALTER PROCEDURE CreateCritiqueReply
 @CritiqueId INT,
@@ -344,15 +337,35 @@ CREATE OR ALTER PROCEdURE DeleteCritiqueReply
 AS
 DELETE FROM CritiqueReply WHERE CritiqueReplyId=@CritiqueReplyId AND UserId=@UserId;
 
-CREATE OR ALTER PROCEdURE DeleteCritique
-@CritiqueId INT,
-@UserId INT
+CREATE OR ALTER PROCEDURE DeleteCritique
+    @CritiqueId INT,
+    @UserId INT
 AS
 BEGIN
-DELETE FROM CritiqueReply WHERE CritiqueId=@CritiqueId AND UserId=@UserId;
-DELETE FROM CritiqueLike WHERE CritiqueId=@CritiqueId
 DELETE FROM Critique WHERE CritiqueId=@CritiqueId AND UserId=@UserId;
 END;
+
+
+
+
+
+CREATE OR ALTER PROCEDURE DeleteCritique
+    @CritiqueId INT,
+    @UserId INT
+AS
+BEGIN
+    IF EXISTS (SELECT * FROM Critique WHERE CritiqueId = @CritiqueId AND UserId = @UserId)
+    BEGIN
+        DELETE FROM CritiqueReply WHERE CritiqueId = @CritiqueId;
+        DELETE FROM CritiqueLike WHERE CritiqueId = @CritiqueId;
+        DELETE FROM Critique WHERE CritiqueId = @CritiqueId AND UserId = @UserId;
+    END
+    ELSE
+    BEGIN
+        RAISERROR('The critique does not exist or does not belong to the specified user.', 16, 1);
+    END
+END;
+
 
 CREATE OR ALTER PROCEDURE EditCritique
 @CritiqueId INT,
@@ -503,6 +516,9 @@ CREATE OR ALTER PROCEDURE DeleteUser
 AS
 BEGIN
 
+
+SELECT * FROM Users
+
   -- Delete the user from the Users table.
   DELETE FROM Users
   WHERE UserId = @UserId;
@@ -535,4 +551,35 @@ END;
 
 
 
+
+
+
+
+
+CREATE OR ALTER PROCEDURE AddMember
+@UserId INT,
+@CommunityId INT
+AS
+BEGIN
+INSERT INTO CommunityMembers VALUES (@CommunityId,@UserId,GETDATE())
+END;
+
+CREATE OR ALTER PROCEDURE ListDiscussion
+@communityId INT
+AS
+SELECT * FROM CommunityDiscussion WHERE CommunityId=@communityId;
+
+
+CREATE OR ALTER PROCEDURE getUsersRating
+@UserId INT
+AS
+SELECT * From Rating WHERE UserId=@UserId
+
+
+SELECT * FROM Book
+
+SELECT * FROM CritiqueLike
+SELECT * from Critique
+SELECT * FROM CritiqueReply
+SELECT * from Community
 SELECT * FROM Book

@@ -207,9 +207,13 @@ SELECT * FROM Users
 --DROP TABLE Critique
 --DROP TABLE BookShelf
 --DROP TABLE Rating
---DROP TABLE DiscussionReply
---DROP TABLE CommunityDiscussion
---DROP TABLE CommunityMembers
---DROP TABLE Community
+DROP TABLE DiscussionReply
+DROP TABLE CommunityDiscussion
+DROP TABLE CommunityMembers
+DROP TABLE Community
 --DROP TABLE Book
+
+DELETE FROM Rating WHERE RatingId=7
+
+
 --Drop TABLE Users

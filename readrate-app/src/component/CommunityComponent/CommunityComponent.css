@@ -1,0 +1,16 @@
+*{
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+@media (max-width: 500px) {
+  .grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(350px));
+  }
+}
+
+.community-Operation
+{
+  display: flex;
+  flex-direction: row;
+  column-gap: 2px;
+  justify-content: space-around;
+}

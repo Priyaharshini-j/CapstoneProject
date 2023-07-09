@@ -140,7 +140,7 @@ const SearchBarComponent = () => {
                             aria-label="View Book"
                             onClick={() => handleViewBook(book)}
                           >
-                            <Link to='/book' state={{ bookIsbn: book.volumeInfo.industryIdentifiers?.[0].identifier, title: book.volumeInfo.title, author: book.volumeInfo.authors?.[0], publisher: book.volumeInfo.publisher, buyLink: book.saleInfo.buyLink, coverImage: book.volumeInfo.imageLinks?.thumbnail, rating: book.volumeInfo.averageRating, genre: book.volumeInfo.categories?.[0], desc: book.volumeInfo.description}}>
+                            <Link to='/book' state={{ bookIsbn: book.volumeInfo.industryIdentifiers?.[0].identifier, title: book.volumeInfo.title, author: book.volumeInfo.authors?.[0], publisher: book.volumeInfo.publisher, publishedDate: book.volumeInfo.publishedDate, buyLink: book.saleInfo.buyLink, coverImage: book.volumeInfo.imageLinks?.thumbnail, rating: book.volumeInfo.averageRating, genre: book.volumeInfo.categories?.[0], desc: book.volumeInfo.description}}>
                               <VisibilityIcon />
                             </Link>
                           </IconButton>

@@ -1,12 +1,14 @@
 import { AddIcon } from '@chakra-ui/icons';
 import { Card, CardBody, CardHeader, Heading, SimpleGrid, Text, color } from '@chakra-ui/react';
 import { Add, AddIcCallOutlined } from '@mui/icons-material';
-import {Fab} from '@mui/material'
+import {Alert, AlertTitle, Fab} from '@mui/material'
 import { Box, colors } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom';
 import './CommunityComponent.css'
+
+
 const CommunityComponent = (props) => {
   const location = useLocation();
   const bookDetails = {
@@ -31,7 +33,20 @@ const CommunityComponent = (props) => {
     Publisher: location.state?.publisher,
     PublishedDate: location.state?.publishedDate,
   }
-
+  const [alert, setAlert] = useState(null);
+  const handleAdd= async(communityId)=>{
+    const addMemberData = {
+      communityId: communityId,
+      userId: sessionStorage.getItem("userId")
+    }
+    const addResult = await axios.post("http://localhost:5278/Book/AddMember",addMemberData);
+    console.log(addResult);
+    if (addResult.data.result === true) {
+      setAlert(true);
+    } else {
+      setAlert(false);
+    }
+  }
   const [communityList, setCommunityList] = useState(null);
   console.log(bookDetails)
   useEffect(() => {
@@ -46,11 +61,23 @@ const CommunityComponent = (props) => {
 
   if (communityList === null) {
     return <div>Loading...</div>;
-  } else if (communityList.length === 0) {
+  } else if (communityList[0].communityId === 0) {
     return <div>No Community Found</div>;
   } else {
     return (
       <React.Fragment>
+        {alert === true && (
+          <Alert severity="success">
+            <AlertTitle>Success</AlertTitle>
+            Successfully Followed the Community <strong>check it out by reloading the page!</strong>
+          </Alert>
+        )}
+        {alert === false && (
+          <Alert severity="error">
+            <AlertTitle>Error</AlertTitle>
+            This is an error alert — <strong>You were already a member of this community</strong>
+          </Alert>
+        )}
         <SimpleGrid spacing={4} templateColumns='repeat(auto-fill)' className='grid-container'>
           {communityList.map((community) => (
             <Card
@@ -72,7 +99,7 @@ const CommunityComponent = (props) => {
                         <li><p>Created On: {new Date(community.createdDate).toLocaleDateString()}</p></li></ul>
                     </div>
                     <div className='button-Container'>
-                      <Fab variant='extended' color='#5BC0F8' aria-label="addMember"><AddIcon /> Follow</Fab>                      
+                    <Fab variant='extended' color='#5BC0F8' aria-label="addMember" onClick={() => handleAdd(community.communityId)}><AddIcon /> Follow</Fab>                   
                     </div>
                   </div>
 

@@ -1,6 +1,6 @@
 .book-holder {
   display: grid;
-  grid-template-columns: 2fr 3fr;
+  grid-template-columns: 1fr 4fr;
   font-family: 'IBM Plex Sans', sans-serif;
   box-shadow: 4px 2px 2px 2px rgb(193, 164, 247);
   border-radius: 5px;
@@ -37,13 +37,13 @@
   .rating-button {
     display: flex;
     flex-direction: column;
-    row-gap: 5px;    
+    row-gap: 5px;
     justify-content: space-evenly;
     align-items: center;
   }
 
   .button-container {
-    justify-content: space-evenly;
+    justify-content: space-around;
     display: flex;
     row-gap: 10px;
     flex-direction: row;
@@ -51,4 +51,13 @@
     flex-wrap: wrap;
     align-content: flex-end;
   }
+}
+
+.pop {
+  width: min-content;
+  display: flex;
+  color: white;
+  font-size: 18px;
+  justify-content: center;
+  align-items: center;
 }

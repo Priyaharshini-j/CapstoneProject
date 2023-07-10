@@ -56,8 +56,6 @@ const SearchBarComponent = () => {
     );
   };
 
-
-
   return (
     <React.Fragment>
       <div className='search-component-container'>

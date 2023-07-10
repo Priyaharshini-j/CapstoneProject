@@ -113,7 +113,7 @@ namespace ReadRate.Controllers
             return book;
         }
 
-        public int[] getCritqueLikeByCritiqieId(int critqueId)
+        public int[] getCritqueLikeByCritiqueId(int critqueId)
         {
 
             int[] critiqueLike = new int[2];
@@ -380,8 +380,8 @@ namespace ReadRate.Controllers
                         critique.BookId = Convert.ToInt32(dr["BookId"]);
                         critique.UserId = Convert.ToInt32(dr["UserId"]);
                         critique.CritiqueDesc = dr["CritiqueDesc"].ToString();
-                        critique.Like = getCritqueLikeByCritiqieId(critique.CritiqueId)[1];
-                        critique.Dislike = getCritqueLikeByCritiqieId(critique.CritiqueId)[0];
+                        critique.Like = getCritqueLikeByCritiqueId(critique.CritiqueId)[1];
+                        critique.Dislike = getCritqueLikeByCritiqueId(critique.CritiqueId)[0];
                         critique.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
                         critique.result.result = true;
                         critique.result.message = "Found thwe critique";

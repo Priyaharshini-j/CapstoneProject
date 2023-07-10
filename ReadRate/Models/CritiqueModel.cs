@@ -25,7 +25,9 @@
 
     public class CreatingCritique
     {
-        public int BookId { get; set; }
+
+        public string ISBN { get; set; }
+        public int UserId { get; set; }
         public string CritiqueDesc { get; set; }
     }
 
@@ -33,6 +35,7 @@
     {
         public int critiqueId { get; set; }
         public int LikeStatus { get; set; }
+        public int UserId { get; set; }
 
     }
     public class EditCritiqueDesc
@@ -47,6 +50,18 @@
         public int CritiqueReplyId {  get; set; }
         public int CritiqueId { get; set; }
         public string Reply { get; set; }
+    }
+
+    public class CritiqueList
+    {
+        public int CritiqueId { get; set; }
+        public int BookId { get; set; }
+        public string  UserName { get; set; }
+        public string CritiqueDesc { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public int Like { get; set; }
+        public int Dislike { get; set; }
+        public Result result { get; set; }
     }
 }
 

@@ -27,11 +27,11 @@ namespace ReadRate.Controllers
         }
 
         [HttpPost, Route("[action]", Name = "BookCritique")]
-        public async Task<List<CritiqueModel>>CritiqueList(BookDetails book)
+        public async Task<List<CritiqueList>>CritiqueList(BookDetails book)
         {
             _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
             _conn.Open();
-            List<CritiqueModel> critiques = new List<CritiqueModel>();
+            List<CritiqueList> critiques = new List<CritiqueList>();
             int bookId = await supplementaryController.getBookIdByISBN(book);
             try
             {
@@ -48,18 +48,22 @@ namespace ReadRate.Controllers
                         Console.WriteLine("Found");
                         foreach (DataRow dr in dt.Rows)
                         {
-                            CritiqueModel critique = new CritiqueModel();
+                            CritiqueList critique = new CritiqueList();
+                            int criti_Id = Convert.ToInt32(dr["CritiqueId"]);
                             critique.CritiqueId = Convert.ToInt32(dr["CritiqueId"]);
                             critique.BookId = Convert.ToInt32(dr["BookId"]);
-                            critique.UserId = Convert.ToInt32(dr["UserId"]);
+                            int UserId = Convert.ToInt32(dr["UserId"]);
+                            critique.UserName = supplementaryController.FetchNameById(UserId);
                             critique.CritiqueDesc = dr["CritiqueDesc"].ToString();
                             critique.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                            critique.Like = supplementaryController.getCritqueLikeByCritiqueId(criti_Id)[1]; 
+                            critique.Dislike = supplementaryController.getCritqueLikeByCritiqueId(criti_Id)[0];
                             critiques.Add(critique);
                         }
                     }
                     else
                     {
-                        CritiqueModel critique = new CritiqueModel();
+                        CritiqueList critique = new CritiqueList();
                         critique.result = new Models.Result();
                         critique.result.result = true;
                         critique.result.message = "No Critique found for this book";
@@ -70,12 +74,12 @@ namespace ReadRate.Controllers
             }
             catch (SqlException ex)
             {
-                CritiqueModel critique = new CritiqueModel();
+                CritiqueList critique = new CritiqueList();
                 critique.result = new Models.Result();
                 critique.result.result = false;
                 critique.result.message = ex.Message;
                 critiques.Add(critique);
-                Console.WriteLine(ex.ToString);
+                Console.WriteLine(ex.ToString());
             }
             _conn.Close();
             return critiques;
@@ -109,8 +113,8 @@ namespace ReadRate.Controllers
                             critique.BookId = Convert.ToInt32(dr["BookId"]);
                             critique.UserId = Convert.ToInt32(dr["UserId"]);
                             critique.CritiqueDesc = dr["CritiqueDesc"].ToString();
-                            critique.Like = supplementaryController.getCritqueLikeByCritiqieId(critique.CritiqueId)[1];
-                            critique.Dislike = supplementaryController.getCritqueLikeByCritiqieId(critique.CritiqueId)[0];
+                            critique.Like = supplementaryController.getCritqueLikeByCritiqueId(critique.CritiqueId)[1];
+                            critique.Dislike = supplementaryController.getCritqueLikeByCritiqueId(critique.CritiqueId)[0];
                             critique.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
                             critiqueList.Add(critique);
                         }
@@ -142,7 +146,8 @@ namespace ReadRate.Controllers
         public UserCritique CreatingCritique(CreatingCritique critiqueModel)
         {
             UserCritique critique = new UserCritique();
-            int? UserId = Context.HttpContext.Session.GetInt32("UserId");
+            int? UserId = critiqueModel.UserId;
+            int BookId = supplementaryController.GetBookId(critiqueModel.ISBN);
             try
             {
                 _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
@@ -151,7 +156,7 @@ namespace ReadRate.Controllers
                 {
                     SqlCommand cmd = new SqlCommand("CreateCritique",_conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@BookId",critiqueModel.BookId);
+                    cmd.Parameters.AddWithValue("@BookId", BookId);
                     cmd.Parameters.AddWithValue("@UserId", UserId);
                     cmd.Parameters.AddWithValue("@CritiqueDesc", critiqueModel.CritiqueDesc);
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
@@ -166,8 +171,8 @@ namespace ReadRate.Controllers
                             critique.BookId = Convert.ToInt32(dr["BookId"]);
                             critique.UserId = Convert.ToInt32(dr["UserId"]);
                             critique.CritiqueDesc = dr["CritiqueDesc"].ToString();
-                            critique.Like = supplementaryController.getCritqueLikeByCritiqieId(critique.CritiqueId)[1];
-                            critique.Dislike = supplementaryController.getCritqueLikeByCritiqieId(critique.CritiqueId)[0];
+                            critique.Like = supplementaryController.getCritqueLikeByCritiqueId(critique.CritiqueId)[1];
+                            critique.Dislike = supplementaryController.getCritqueLikeByCritiqueId(critique.CritiqueId)[0];
                             critique.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
                         }
                     }
@@ -319,7 +324,7 @@ namespace ReadRate.Controllers
                     SqlCommand cmd = new SqlCommand("LikeDislikeCritique", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@CritiqueId", critiqueLikeDislike.critiqueId);
-                    cmd.Parameters.AddWithValue("@UserId", UserId);
+                    cmd.Parameters.AddWithValue("@UserId", critiqueLikeDislike.UserId);
                     cmd.Parameters.AddWithValue("@LikeStatus", critiqueLikeDislike.LikeStatus);
                     cmd.ExecuteNonQuery();
                     result.result = true;
@@ -363,8 +368,8 @@ namespace ReadRate.Controllers
                             editedCritique.BookId = Convert.ToInt32(dr["BookId"]);
                             editedCritique.UserId = Convert.ToInt32(dr["UserId"]);
                             editedCritique.CritiqueDesc = dr["CritiqueDesc"].ToString();
-                            editedCritique.Like = supplementaryController.getCritqueLikeByCritiqieId(editedCritique.CritiqueId)[1];
-                            editedCritique.Dislike = supplementaryController.getCritqueLikeByCritiqieId(editedCritique.CritiqueId)[0];
+                            editedCritique.Like = supplementaryController.getCritqueLikeByCritiqueId(editedCritique.CritiqueId)[1];
+                            editedCritique.Dislike = supplementaryController.getCritqueLikeByCritiqueId(editedCritique.CritiqueId)[0];
                             editedCritique.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
                         }
                     }

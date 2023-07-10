@@ -31,6 +31,11 @@ namespace ReadRate.Controllers
         [HttpPost, Route("[action]", Name = "BookCommunityList")]
         public async Task<List<CommunityList>> CommunityList(BookDetails book)
         {
+            Console.WriteLine(book.ISBN);
+            Console.WriteLine(book.BookName);
+            Console.WriteLine(book.Publisher);
+            Console.WriteLine(book.Author);
+            Console.WriteLine(book.Genre);
             List<CommunityList> communities = new List<CommunityList>();
             int bookId = await supplementaryController.getBookIdByISBN(book); 
             try
@@ -160,7 +165,7 @@ namespace ReadRate.Controllers
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@CommunityName", comm.CommunityName);
                     cmd.Parameters.AddWithValue("@CommunityDesc", comm.CommunityDesc);
-                    cmd.Parameters.AddWithValue("@CommunityAdmin", convertedUserId);
+                    cmd.Parameters.AddWithValue("@CommunityAdmin", comm.userId);
                     cmd.Parameters.AddWithValue("@BookId", bookId);
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
@@ -231,37 +236,40 @@ namespace ReadRate.Controllers
         }
 
         [HttpPost, Route("[action]", Name = "AddMember")]
-        public Result AddMember(int CommunityId)
+        public Result AddMember(AddMemberCommunity CommMem)
         {
             Result results = new Result();
             try
             {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
                 using (_conn)
                 {
                     _conn.Open();
-
-                    // Check if the CommunityId exists in the Community table
-                    SqlCommand checkCmd = new SqlCommand("SELECT COUNT(*) FROM Community WHERE CommunityId = @CommunityId", _conn);
-                    checkCmd.Parameters.AddWithValue("@CommunityId", CommunityId);
-                    int communityCount = (int)checkCmd.ExecuteScalar();
-                    Console.WriteLine(communityCount);
-                    if (communityCount == 0)
+                    if (CommMem != null)
+                    {
+                        SqlCommand cmd = new SqlCommand("AddMember", _conn);
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        int? userId = CommMem.userId;
+                        int convertedUserId = userId.HasValue ? userId.Value : 0;
+                        cmd.Parameters.AddWithValue("@UserId", convertedUserId);
+                        cmd.Parameters.AddWithValue("@CommunityId", CommMem.CommunityId);
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            results.result = true;
+                            results.message = "You have been added as a member";
+                        }
+                        else
+                        {
+                            results.result = false;
+                            results.message = "Failed to add as a member";
+                        }
+                    }
+                    else
                     {
                         results.result = false;
-                        results.message = "Invalid CommunityId";
-                        return results;
+                        results.message = "Invalid request data";
                     }
-
-                    SqlCommand cmd = new SqlCommand("AddMember", _conn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    int? userId = Context.HttpContext.Session.GetInt32("UserId");
-                    int convertedUserId = userId.HasValue ? userId.Value : 0;
-                    cmd.Parameters.AddWithValue("@UserId", convertedUserId);
-                    cmd.Parameters.AddWithValue("@CommunityId", CommunityId);
-                    cmd.ExecuteNonQuery();
-
-                    results.result = true;
-                    results.message = "You have been added as a member";
                 }
             }
             catch (SqlException ex)
@@ -269,10 +277,10 @@ namespace ReadRate.Controllers
                 results.result = false;
                 results.message = ex.Message;
             }
-                _conn.Close();
 
             return results;
         }
+
 
 
         [HttpPost, Route("[action]" , Name ="AddToShelf")]

@@ -213,7 +213,7 @@ DROP TABLE CommunityMembers
 DROP TABLE Community
 --DROP TABLE Book
 
-DELETE FROM Rating WHERE RatingId=7
+DELETE FROM CommunityMembers WHERE CommunityMemberId=3
 
 
 --Drop TABLE Users

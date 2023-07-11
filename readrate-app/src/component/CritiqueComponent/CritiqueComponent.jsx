@@ -6,7 +6,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom';
 import '../CommunityComponent/CommunityComponent.css'
-import { FavoriteRounded, HeartBroken } from '@mui/icons-material';
+import { FavoriteRounded, HeartBroken, ReplyOutlined, SendOutlined } from '@mui/icons-material';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 const CritiqueComponent = (props) => {
@@ -33,6 +33,28 @@ const CritiqueComponent = (props) => {
     Publisher: location.state?.publisher,
     PublishedDate: location.state?.publishedDate,
   }
+  const [replyListAlert, setReplyListAlert] = useState(null)
+  const [critiqueReply, setCritiqueReply] = useState(null)
+  const handleCritiqueReplyList = async (critiqueId) => {
+    const criti_repl = await axios.post("http://localhost:5278/api/Critique/GetCritiqueReplyById", critiqueId);
+    if (criti_repl.data.result.result === true) {
+      setCritiqueReply(criti_repl.data.reply);
+      setReplyListAlert(true);
+    }
+    else {
+      setReplyListAlert(false);
+    }
+
+  }
+
+
+
+
+
+
+
+
+
   const [alert, setAlert] = useState(null);
   const handleLike = async (likeStatus, critiqueId) => {
     const likeData = {
@@ -121,6 +143,34 @@ const CritiqueComponent = (props) => {
                       >
                         <HeartBroken color='error' />
                       </Fab>&nbsp;{critique.dislike}  DisLike
+                      <Fab variant='extended' size='small' color='' onClick={() => handleCritiqueReplyList(critique.critiqueId)}>
+                        <ReplyOutlined />
+                      </Fab> See Replies
+                      <Fab variant='extended' size='small' color='' onClick={() => handleCritiqueReplyBox(critique.critiqueId)}>
+                        <SendOutlined />
+                      </Fab> Send a Reply
+                    </div>
+                    {replyListAlert === true && (
+                      <Alert severity="success">
+                        <AlertTitle>Success</AlertTitle>
+                        Liked the Critique— <strong>check it out by reloading the page!</strong>
+                      </Alert>
+                    )}
+                    {replyListAlert === false && (
+                      <Alert severity="warning">
+                        <AlertTitle>No Reply Found</AlertTitle>
+                        <strong>NO reply is made under this critique- Be the first to add a Comment</strong>
+                      </Alert>
+                    )}
+                    <div>
+                      {
+                        critiqueReply.map((reply) => (
+                          <div key={reply.critiqueReplyId}>          
+                            <p>{reply.reply}</p>
+                            <span>Created By: @{reply.userName}</span>&nbsp;&nbsp;<span> Created On:{new Date(reply.createdDate).toLocaleDateString() }</span>
+                          </div>
+                        ))
+                      }
                     </div>
                   </div>
                 </Box>

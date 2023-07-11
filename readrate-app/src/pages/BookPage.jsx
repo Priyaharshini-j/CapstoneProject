@@ -162,7 +162,7 @@ function BookPage(props) {
     console.log(shelfData);
     const bookResult = await axios.post("http://localhost:5278/Book/AddingBook", shelfData)
     console.log(bookResult.data.result);
-
+    setIsDropdownOpen(false);
     if (bookResult.data.result === true) {
       setShelfAlert(true);
     }

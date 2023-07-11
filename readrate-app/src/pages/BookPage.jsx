@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import MainLayout from '../layout/MainLayout';
-import { Alert, AlertTitle, Button, Fab, FormControl, InputLabel, Rating, TextField, TextareaAutosize, Typography } from '@mui/material';
+import { Alert, AlertTitle, Button, Fab, FormControl, Rating, TextField, TextareaAutosize, Typography } from '@mui/material';
 import { Heading, Text } from '@chakra-ui/react';
 import '../component/BookComponent/BookComponent.css';
 import Box from '@mui/material/Box';
@@ -16,9 +16,10 @@ import PeopleIcon from '@mui/icons-material/People';
 import ReviewsOutlinedIcon from '@mui/icons-material/ReviewsOutlined';
 import WallpaperOutlinedIcon from '@mui/icons-material/WallpaperOutlined';
 import axios from 'axios';
-import { Edit, GroupAdd, PostAdd } from '@mui/icons-material';
+import { AutoStoriesOutlined, Edit, GroupAdd, PostAdd } from '@mui/icons-material';
 import Modal from '@mui/material/Modal';
-
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 
 
 const style = {
@@ -136,6 +137,40 @@ function BookPage(props) {
     handleClose();
   };
 
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const handleBookShelf = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+  const [ShelfReading, setShelfReading] = useState('');
+  const [ShelfAlert, setShelfAlert] = useState(null);
+  const handleAddingBook = async (shelf) => {
+    const shelfData = {
+      book: {
+        isbn: location.state?.bookIsbn,
+        bookName: location.state?.title,        
+        genre: location.state?.genre,
+        author: location.state?.author,        
+        coverUrl: location.state?.coverImage,
+        bookDesc: location.state?.desc,
+        publisher: location.state?.publisher,
+        publishedDate: location.state?.publishedDate,
+      },
+      userId: userId,
+      bookShelfName: shelf
+    }
+    console.log(shelfData);
+    const bookResult = await axios.post("http://localhost:5278/Book/AddingBook", shelfData)
+    console.log(bookResult.data.result);
+
+    if (bookResult.data.result === true) {
+      setShelfAlert(true);
+    }
+    else {
+      setShelfAlert(false);
+    }
+  };
+
   return (
     <MainLayout>
       <div>
@@ -216,6 +251,21 @@ function BookPage(props) {
                 </Modal>
                 <Fab variant='extended' color='info' onClick={handleOpen} ><Edit />&nbsp; Write Critique</Fab>
                 <Fab variant='extended' color='secondary'> <PostAdd /> Share a Post</Fab>
+                <Fab variant='extended' color='error' onClick={handleBookShelf}><AutoStoriesOutlined />Add to Shelf {isDropdownOpen ? "Close" : "Open"}</Fab>
+
+                {isDropdownOpen && (
+                  <Select value={ShelfReading} onChange={(event) => {
+                    const value = event.target.value;
+                    setShelfReading(value);
+                    handleAddingBook(value); // Call handleAddingBook without passing any parameter
+                  }}
+                  
+                  >
+                    <MenuItem value={"Need To Read"}>Need To Read</MenuItem>
+                    <MenuItem value={"Reading"}>Reading</MenuItem>
+                    <MenuItem value={"Already Read"}>Already Read</MenuItem>
+                  </Select>
+                )}
               </div>
               <div>
                 <br />
@@ -230,6 +280,20 @@ function BookPage(props) {
                   justifyContent="center"
                 />
               </div>
+              {
+                ShelfAlert === true && (
+                  <Alert severity="success">
+                    <AlertTitle>Success</AlertTitle>
+                    Successfully Added the Book to Your shelf <strong>check it out in Your Profile Page!</strong>
+                  </Alert>
+                )}
+              {ShelfAlert === false && (
+                <Alert severity="error">
+                  <AlertTitle>Error</AlertTitle>
+                  This is an error alert — <strong>You were already Added the Book to your shelf. Check it out in the Profile page</strong>
+                </Alert>
+              )
+              }
               {alert === true && (
                 <Alert severity="success">
                   <AlertTitle>Success</AlertTitle>
@@ -283,7 +347,7 @@ function BookPage(props) {
           </TabContext>
         </Box>
       </div>
-    </MainLayout>
+    </MainLayout >
 
   )
 }

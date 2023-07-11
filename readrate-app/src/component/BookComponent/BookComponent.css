@@ -17,13 +17,15 @@
   border: 0.5mm solid grey;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 700px) {
   .book-holder {
     padding: 0px 5px;
-    border: 0.25mm solid;
     box-shadow: 0px 0px;
     font-size: 14px;
-    width: min-content;
+    width: auto;
+    top: 50%;
+    left: 50%;
+    margin-right: 15px;
   }
 
   .image-container {

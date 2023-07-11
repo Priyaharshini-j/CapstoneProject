@@ -296,9 +296,8 @@ namespace ReadRate.Controllers
                     SqlCommand cmd = new SqlCommand("AddBookShelf", _conn);
                     Console.WriteLine("1");
                     cmd.CommandType= CommandType.StoredProcedure;
-                    int? userId = Context.HttpContext.Session.GetInt32("UserId");
                     int bookId = await supplementaryController.getBookIdByISBN(bookShelf.Book);
-                    cmd.Parameters.AddWithValue("@UserId",userId);
+                    cmd.Parameters.AddWithValue("@UserId",bookShelf.userId);
                     cmd.Parameters.AddWithValue("@BookId", bookId);
                     cmd.Parameters.AddWithValue("@ReadingStatus", bookShelf.BookShelfName);
                     Console.WriteLine("1");

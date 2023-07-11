@@ -14,6 +14,7 @@
     public class AddBookShelf
     {
         public  BookDetails Book { get; set; }
+        public int userId { get; set; }
         public string BookShelfName { get; set; }
     }
 

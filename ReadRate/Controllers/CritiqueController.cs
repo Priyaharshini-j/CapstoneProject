@@ -234,6 +234,70 @@ namespace ReadRate.Controllers
             return result;
         }
         */
+        [HttpPost, Route("[action]", Name = "CritiqueReplyList")]
+        public CritiqueReplyList GetCritiqueReplyById(int CritiqueId)
+        {
+            CritiqueReplyList critiqueWithReply = new CritiqueReplyList();
+            _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+            _conn.Open();
+            try
+            {
+                using (_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("GetCritiqueReplyById", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CritiqueId", CritiqueId);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        Console.WriteLine("Found");
+                        List<ReplyForCritique> reply = new List<ReplyForCritique>();
+                        foreach (DataRow dr in dt.Rows)
+                        {
+                            ReplyForCritique criReply = new ReplyForCritique();
+                            criReply.CritiqueReplyId = (int)dr["CritiqueReplyId"];
+                            criReply.CritiqueId = Convert.ToInt32(dr["CritiqueId"]);
+                            int userId = Convert.ToInt32(dr["UserId"]);
+                            criReply.userName = supplementaryController.FetchNameById(userId);
+                            criReply.Reply = dr["Reply"].ToString();
+                            criReply.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                            reply.Add(criReply);
+                        }
+                        critiqueWithReply.Reply = reply;
+                        critiqueWithReply.Result = new Result
+                        {
+                            result = true,
+                            message = "Success"
+                        };
+                    }
+                    else
+                    {
+                        critiqueWithReply.Reply = new List<ReplyForCritique>();
+                        critiqueWithReply.Result = new Result
+                        {
+                            result = false,
+                            message = "Not found"
+                        };
+                        Console.WriteLine("No Critique reply found");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                critiqueWithReply.Reply = new List<ReplyForCritique>();
+                critiqueWithReply.Result = new Result
+                {
+                    result = false,
+                    message = ex.Message
+                };
+                Console.WriteLine(ex.Message);
+            }
+            return critiqueWithReply;
+        }
+
+
         [HttpPost, Route("[action]", Name = "CreatingCritiqueReply")]
         public CritiqueWithReply CreatingCritiqueReply(CreateCritiqueReply critiqueReply)
         {

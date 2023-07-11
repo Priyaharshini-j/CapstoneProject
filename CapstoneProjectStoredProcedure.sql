@@ -583,3 +583,9 @@ SELECT * from Critique
 SELECT * FROM CritiqueReply
 SELECT * from Community
 SELECT * FROM Book
+
+
+CREATE OR ALTER PROCEDURE GetCritiqueReplyById
+@CritiqueId INT
+AS
+SELECT * FROM CritiqueReply WHERE CritiqueId=@CritiqueId

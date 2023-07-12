@@ -8,6 +8,16 @@
   align-items: center;
 }
 
+.book-holder-1 {
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
+  font-family: 'IBM Plex Sans', sans-serif;
+  box-shadow: 4px 2px 2px 2px rgb(193, 164, 247);
+  border-radius: 5px;
+  padding: 0px 30px;
+  align-items: center;
+}
+
 .image-container {
   margin-right: 10px;
 }

@@ -2,8 +2,10 @@ import axios from 'axios'
 import React, { useState } from 'react'
 import './SignupComponent.css'
 import LoginComponent from '../LoginComponent/LoginComponent'
+import { useNavigate } from 'react-router'
 
 export const SignupComponent = () => {
+  const navigate = useNavigate();
   const [userName, setUserName] = useState("")
   const [userEmail, setUserEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -13,7 +15,7 @@ export const SignupComponent = () => {
   const [logIn, setLogIn] = useState(false)
 
   const handleSignUp = async () => {
-    if(userName !== null || userEmail !== null || password!== null || confirmPassword !== null || securityQn !== null ||securityAns !== null)
+    if(userName === null || userEmail === null || password=== null || confirmPassword === null || securityQn === null ||securityAns === null)
     {
       alert("Fill all the fields");
     }
@@ -29,7 +31,7 @@ export const SignupComponent = () => {
       const res = await axios.post("http://localhost:5278/User/SignUp", data);
       console.log(res.data.result);
       if(res.data.result === true){
-        return(<LoginComponent/>)
+       navigate('/');
       }
       else{
         alert(res.data.message);

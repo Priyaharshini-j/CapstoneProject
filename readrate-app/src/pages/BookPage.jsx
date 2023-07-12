@@ -41,8 +41,6 @@ const style = {
 
 function BookPage(props) {
   const location = useLocation();
-  console.log(props, 'props');
-  console.log(location, 'location');
   const [value, setValue] = React.useState('1');
   const [rate, setRating] = useState(0);
   const userId = sessionStorage.getItem("userId");
@@ -109,9 +107,12 @@ function BookPage(props) {
     }
     if (communityName !== null || communityDesc !== null) {
       const commRes = await axios.post("http://localhost:5278/Book/CreateCommunity", communityData);
-      console.log(commRes.data);
+      
       if (commRes.data.result.result === true) {
         setCommAlert(true);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
       else {
         setCommAlert(false);
@@ -123,7 +124,7 @@ function BookPage(props) {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
+  const [criAlert, setCriAlert] = useState(null);
   const [critiqueDesc, setCritiqueDesc] = useState('');
   const handleSubmit = () => {
     const data = {
@@ -131,8 +132,13 @@ function BookPage(props) {
       userId: userId,
       critiqueDesc: critiqueDesc,
     };
-    if (critiqueDesc !== null) {
+    if (critiqueDesc !== '') {
       axios.post("http://localhost:5278/api/Critique/CreatingCritique", data);
+      setCriAlert(true);
+      handleClose();
+    }
+    else{
+      setCriAlert(false);
     }
     handleClose();
   };
@@ -159,9 +165,7 @@ function BookPage(props) {
       userId: userId,
       bookShelfName: shelf
     }
-    console.log(shelfData);
     const bookResult = await axios.post("http://localhost:5278/Book/AddingBook", shelfData)
-    console.log(bookResult.data.result);
     setIsDropdownOpen(false);
     if (bookResult.data.result === true) {
       setShelfAlert(true);
@@ -191,12 +195,10 @@ function BookPage(props) {
               }}
               py="2"
             >
-              {details.author}
+              Author: {details.author}
             </Text>
-            <Text py="2">{details.genre}</Text>
-            {console.log(details.rating)}
+            <Text py="2">Genre: {details.genre}</Text>
             <Rating name="read-only" value={details.rating} size="small" readOnly />
-            {console.log(details.desc)}
             <Typography variant="body2" align='justify' style={{ wordBreak: 'break-word' }}>{details.desc}</Typography>
             <br />
             <br />
@@ -250,7 +252,8 @@ function BookPage(props) {
                   </Box>
                 </Modal>
                 <Fab variant='extended' color='info' onClick={handleOpen} ><Edit />&nbsp; Write Critique</Fab>
-                <Fab variant='extended' color='secondary'> <PostAdd /> Share a Post</Fab>
+                {/* 
+                <Fab variant='extended' color='secondary'> <PostAdd /> Share a Post</Fab> */}
                 <Fab variant='extended' color='error' onClick={handleBookShelf}><AutoStoriesOutlined />Add to Shelf {isDropdownOpen ? "Close" : "Open"}</Fab>
 
                 {isDropdownOpen && (
@@ -320,7 +323,8 @@ function BookPage(props) {
                 indicatorColor="secondary" centered >
                 <Tab icon={<PeopleIcon color='primary' />} label="Community" value="1" />
                 <Tab icon={<ReviewsOutlinedIcon color='warning' />} label="Critique" value="2" />
-                <Tab icon={<WallpaperOutlinedIcon color='info' />} label="Post" value="3" />
+                {/* <Tab icon={<WallpaperOutlinedIcon color='info' />} label="Post" value="3" />*/}
+                
               </TabList>
             </Box>
             <TabPanel value="1">
@@ -339,11 +343,26 @@ function BookPage(props) {
               <CommunityComponent state={{ bookIsbn: details.isbn, title: details.title, author: details.author, publisher: details.publisher, publishedDate: details.publishedDate, buyLink: details.buyLink, coverImage: details.coverImage, rating: details.rating, genre: details.genre, desc: details.desc }} />
             </TabPanel>
             <TabPanel value="2">
+            {criAlert === true && (
+                <Alert severity="success">
+                  <AlertTitle>Success</AlertTitle>
+                  Successfully Created the Critique <strong>check it out in Your Profile Page!</strong>
+                </Alert>
+              )}
+              {criAlert === false && (
+                <Alert severity="error">
+                  <AlertTitle>Error</AlertTitle>
+                  This is an error alert — <strong> There is an error occured while creating a Critique... Please Try again :&#40;</strong>
+                </Alert>
+              )}
               <CritiqueComponent state={{ bookIsbn: details.isbn, title: details.title, author: details.author, publisher: details.publisher, publishedDate: details.publishedDate, buyLink: details.buyLink, coverImage: details.coverImage, rating: details.rating, genre: details.genre, desc: details.desc }} />
             </TabPanel>
+            {/*
             <TabPanel value="3">
               <PostComponent />
             </TabPanel>
+            */}
+            
           </TabContext>
         </Box>
       </div>

@@ -16,7 +16,7 @@ const LoginComponent = () => {
       password: Password,
     };
 
-    const res = await axios.post("http://localhost:5278/User/Login", data);
+    const res = await axios.post("https://readrate-app.azurewebsites.net/User/Login", data);
     console.log(res.data.result.result);
     if (res.data.result.result === true) {
       sessionStorage.setItem("userId", res.data.userId);

@@ -21,12 +21,14 @@ const NavigationComponent = () => {
           <h3 className="heading">READ & RATE</h3>
         </header>
         <nav className={isMenuOpen ? 'navigation-bar open' : 'navigation-bar'}>
-          <ul className='link'><Link className='link' to="/">Home</Link></ul>
           <ul className='link'><Link className='link' to='/dashboard'>Dashboard</Link></ul>
+          {/* 
           <ul className='link'><Link className='link' to='/community'>Community</Link></ul>
-          <ul className='link'><Link className='link' to='/critique'>Critique</Link></ul>
-          <ul className='link'><Link className='link' to='/post'>Post</Link></ul>
+          <ul className='link'><Link className='link' to='/critique'>Critique</Link></ul>*/}
+          <ul className='link'><Link className='link' to='/MyProfile'>My Profile</Link></ul>
+          <ul className='link'><Link className='link' to="/">Log Out</Link></ul>
           <ul ><span>{userName}</span></ul>
+          
         </nav>
         <div className="hamburger-menu">
           <Menu>
@@ -39,19 +41,19 @@ const NavigationComponent = () => {
               variant='outline'
             />
             <MenuList>
-              <MenuItem command='⌘T'>
+              <MenuItem>
                 <Link className='link' to="/">Home</Link>
               </MenuItem>
-              <MenuItem command='⌘N'>
+              <MenuItem>
                 <Link className='link' to='/dashboard'>Dashboard</Link>
               </MenuItem>
-              <MenuItem command='⌘⇧N'>
+              <MenuItem >
                 <Link className='link' to='/community'>Community</Link>
               </MenuItem>
-              <MenuItem command='⌘O'>
+              <MenuItem>
                 <Link className='link' to='/critique'>Critique</Link>
               </MenuItem>
-              <MenuItem command='⌘L'>
+              <MenuItem>
                 <Link className='link' to='/post'>Post</Link>
               </MenuItem>
             </MenuList>

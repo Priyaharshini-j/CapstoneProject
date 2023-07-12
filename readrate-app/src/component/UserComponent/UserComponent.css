@@ -1,0 +1,21 @@
+.user-container{
+  display: flex;
+  padding: 60px;
+  flex-direction: column;
+  row-gap: 20px;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(152, 224, 248);
+}
+.user-details-container{
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0px ;
+}
+
+.button-contain{
+  display: flex;
+  flex-direction: row;
+  column-gap: 30px;
+  justify-content: space-evenly;
+}

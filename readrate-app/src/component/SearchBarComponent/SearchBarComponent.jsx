@@ -6,7 +6,7 @@ import { Card, CardBody, Heading, Image, Stack, Text } from '@chakra-ui/react';
 import { CircularProgress, IconButton, Rating } from '@mui/material';
 import { AddShoppingCart } from '@mui/icons-material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import BookComponent from '../BookComponent/BookComponent';
 
 
@@ -32,6 +32,27 @@ const SearchBarComponent = () => {
       });
       const books = response.data.items;
       setSearchBookData(books);
+      const bookIsbn = searchBook.volumeInfo.industryIdentifiers?.[0]?.identifier ?? null;
+      const title = searchBook.volumeInfo.title ?? null;
+      const author = searchBook.volumeInfo.authors?.[0] ?? null;
+      const publisher = searchBook.volumeInfo.publisher ?? null;
+      const publishedDate = searchBook.volumeInfo.publishedDate ?? null;
+      const buyLink = searchBook.saleInfo.buyLink ?? null;
+      const coverImage = searchBook.volumeInfo.imageLinks?.thumbnail ?? null;
+      const rating = searchBook.volumeInfo.averageRating ?? null;
+      const genre = searchBook.volumeInfo.categories?.[0] ?? null;
+      const desc = searchBook.volumeInfo.description ?? null;
+
+      console.log("12",bookIsbn);
+      console.log("12",title)
+      console.log("12",author)
+      console.log("12",publisher)
+      console.log("12",publishedDate)
+      console.log("12",buyLink)
+      console.log("12",coverImage)
+      console.log("12",rating)
+      console.log("12",genre)
+      console.log("12",desc)
     } catch (error) {
       console.log(error);
     } finally {
@@ -138,7 +159,7 @@ const SearchBarComponent = () => {
                             aria-label="View Book"
                             onClick={() => handleViewBook(book)}
                           >
-                            <Link to='/book' state={{ bookIsbn: book.volumeInfo.industryIdentifiers?.[0].identifier, title: book.volumeInfo.title, author: book.volumeInfo.authors?.[0], publisher: book.volumeInfo.publisher, publishedDate: book.volumeInfo.publishedDate, buyLink: book.saleInfo.buyLink, coverImage: book.volumeInfo.imageLinks?.thumbnail, rating: book.volumeInfo.averageRating, genre: book.volumeInfo.categories?.[0], desc: book.volumeInfo.description}}>
+                            <Link to='/book' state={{ bookIsbn: book.volumeInfo.industryIdentifiers?.[0].identifier, title: book.volumeInfo.title ?? "not found", author: book.volumeInfo.authors?.[0] ?? "not found", publisher: book.volumeInfo.publisher ?? "not found", publishedDate: book.volumeInfo.publishedDate ?? "not found", buyLink: book.saleInfo.buyLink ?? "not found", coverImage: book.volumeInfo.imageLinks?.thumbnail ?? "not found", rating: book.volumeInfo.averageRating ?? "not found", genre: book.volumeInfo.categories?.[0] ?? "not found", desc: book.volumeInfo.description ?? "not found" }}>
                               <VisibilityIcon />
                             </Link>
                           </IconButton>

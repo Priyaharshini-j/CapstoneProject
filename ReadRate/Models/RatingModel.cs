@@ -35,4 +35,10 @@
         public int userId { get; set; }
         public int Rating { get; set; }
     }
+
+    public class DeleteRating
+    {
+        public int UserId { get; set; }
+        public int BookId { get; set; }
+    }
 }

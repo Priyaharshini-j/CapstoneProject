@@ -133,18 +133,13 @@ namespace ReadRate.Controllers
             Result result = new Result();
             try
             {
-                int? convertedUserID = Context.HttpContext.Session.GetInt32("UserId");
-                int UserId = convertedUserID.HasValue ? convertedUserID.Value : 0;
-
                 conn = new SqlConnection(_configuration["ConnectionStrings:SqlConn"]);
-                conn.Open();
-                if (userModel.UserName != "string" && userModel.UserEmail != "string" && userModel.Password != "string" && userModel.SecurityAns != "string" && userModel.SecurityQn != "string")
-                {                    
+                conn.Open();     
                     using (conn)
                     {
                         SqlCommand cmd = new SqlCommand("UpdateUser", conn);
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.AddWithValue("@UserId", convertedUserID);
+                        cmd.Parameters.AddWithValue("@UserId", userModel.UserId);
                         cmd.Parameters.AddWithValue("@Password", userModel.Password);
                         cmd.Parameters.AddWithValue("@SecurityQn", userModel.SecurityQn);
                         cmd.Parameters.AddWithValue("@SecurityAns", userModel.SecurityAns);
@@ -153,14 +148,16 @@ namespace ReadRate.Controllers
                         {
                             result.result = true;
                             result.message = "User Account Has been Updated successfully";
+                            Console.WriteLine("User Account Has been Updated successfully");
 
                         }
                         else
                         {
                             result.result = false;
                             result.message = "Error in Updating the profile... Try Again";
-                        }
-                    }                    
+
+                            Console.WriteLine("Error in Updating the profile... Try Again");
+                        }           
                 }
                 conn.Close();
             }
@@ -174,11 +171,9 @@ namespace ReadRate.Controllers
         }
 
         [HttpDelete, Route("[action]", Name = "DeleteProfile")]
-        public Models.Result DeleteProfile()
+        public Models.Result DeleteProfile(UserDetail userDetail)
         {
             Models.Result result = new Models.Result();
-            int? convertedUserID = Context.HttpContext.Session.GetInt32("UserId");
-            int UserId = convertedUserID.HasValue ? convertedUserID.Value : 0;
             try
             {
                 conn = new SqlConnection(_configuration["ConnectionStrings:SqlConn"]);
@@ -187,7 +182,7 @@ namespace ReadRate.Controllers
                 {
                     SqlCommand cmd = new SqlCommand("DeleteUser", conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@UserId", UserId);
+                    cmd.Parameters.AddWithValue("@UserId", userDetail.userId);
                     int rowsAffected = cmd.ExecuteNonQuery();
                     if (rowsAffected > 0)
                     {
@@ -214,7 +209,7 @@ namespace ReadRate.Controllers
         }
 
         [HttpGet , Route("[action]", Name = "FetchUserName")]
-        public string FetchUserName()
+        public string FetchUserName(UserDetail userDetail)
         {
             string UserName = "";
             Console.WriteLine("inside the func");
@@ -224,15 +219,13 @@ namespace ReadRate.Controllers
                 Console.WriteLine("inisde he try");
                 conn = new SqlConnection(_configuration["ConnectionStrings:SqlConn"]);
                 conn.Open();
-                int? convertedUserID = Context.HttpContext.Session.GetInt32("UserId");
-                int UserId = convertedUserID.HasValue ? convertedUserID.Value : 0;
                 using (conn)
                 {
                     Console.WriteLine("inside hte using");
                     Console.WriteLine(UserId);
                     SqlCommand cmd = new SqlCommand("getUserName", conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@UserId", UserId);
+                    cmd.Parameters.AddWithValue("@UserId", userDetail.userId);
                     SqlDataReader dr = cmd.ExecuteReader();
                     while(dr.Read())
                     {

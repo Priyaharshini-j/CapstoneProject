@@ -12,4 +12,12 @@
         public DateTime CreatedDate { get; set; }
         public virtual Result result { get; set; }
     }
+    public class CreatePost
+    {
+        public string PostCaption { get; set; }
+        public byte[] Picture { get; set; }
+        public string ISBN { get; set; }
+        public int userId { get; set; }
+
+    }
 }

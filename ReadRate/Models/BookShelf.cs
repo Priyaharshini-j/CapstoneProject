@@ -30,6 +30,7 @@
     public class DeleteBookInShelf
     {
         public int BookShelfId { get; set; }
+        public int UserId { get; set; }
         public int BookId { get; set; }
         public string ReadingStatus { get; set; }
     }

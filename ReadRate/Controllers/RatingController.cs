@@ -56,19 +56,17 @@ namespace ReadRate.Controllers
             return rating;
         }
 
-        [HttpGet, Route("[action]", Name = "UsersRating")]
-        public List<UserRatingModel> UsersRating()
+        [HttpPost, Route("[action]", Name = "UsersRating")]
+        public List<UserRatingModel> UsersRating(UserDetail userDetail)
         {
             _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
             _conn.Open();
-
-            int? userId = Context.HttpContext.Session.GetInt32("UserId");
             List<UserRatingModel> ratings = new List<UserRatingModel>();
             try
             {
                 SqlCommand cmd = new SqlCommand("getUsersRating", _conn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@UserId", userId);
+                cmd.Parameters.AddWithValue("@UserId", userDetail.userId);
                 SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 adapter.Fill(dt);
@@ -143,25 +141,31 @@ namespace ReadRate.Controllers
 
 
         [HttpDelete, Route("[action]" , Name ="DeleteRating")]
-        public Result DeleteRating(int BookId)
+        public Result DeleteRating(DeleteRating deleteRating)
         {
             Result result = new Result();
             try
             {
                 _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
                 _conn.Open();
-                Context.HttpContext.Session.SetInt32("UserId", 1);
-                int? UserId = Context.HttpContext.Session.GetInt32("UserId");
                 using (_conn)
                 {
                     SqlCommand cmd = new SqlCommand("DeleteRating", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@BookId", BookId);
-                    cmd.Parameters.AddWithValue("UserId", UserId);
-                    cmd.ExecuteNonQuery();
-                    result.result = true;
-                    result.message = "Rating for the book is deleted";
+                    cmd.Parameters.AddWithValue("@BookId", deleteRating.BookId);
+                    cmd.Parameters.AddWithValue("UserId", deleteRating.UserId);
 
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        result.result = true;
+                        result.message = "Rating for the book is deleted";
+                    }
+                    else
+                    {
+                        result.result = false;
+                    }
                 }
 
             }

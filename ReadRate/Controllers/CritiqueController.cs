@@ -85,8 +85,8 @@ namespace ReadRate.Controllers
             return critiques;
         }
 
-        [HttpGet , Route("[action]", Name = "UserCritique")]
-        public List<UserCritique> UsersCritiqueList()
+        [HttpPost , Route("[action]", Name = "UserCritique")]
+        public List<UserCritique> UsersCritiqueList(UserDetail userDetail)
         {
             List<UserCritique> critiqueList = new List<UserCritique>();
            
@@ -99,7 +99,7 @@ namespace ReadRate.Controllers
                     SqlCommand cmd = new SqlCommand("GetUsersCritique", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     int? userId = Context.HttpContext.Session.GetInt32("UserId");
-                    cmd.Parameters.AddWithValue("UserId", userId);
+                    cmd.Parameters.AddWithValue("UserId", userDetail.userId);
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     adapter.Fill(dt);
@@ -234,8 +234,8 @@ namespace ReadRate.Controllers
             return result;
         }
         */
-        [HttpPost, Route("[action]", Name = "CritiqueReplyList")]
-        public CritiqueReplyList GetCritiqueReplyById(int CritiqueId)
+        [HttpPost, Route("[action]", Name = "GetCritiqueReplyById")]
+        public CritiqueReplyList GetCritiqueReplyById(getReplyByCritiqueId getReplyByCritiqueId)
         {
             CritiqueReplyList critiqueWithReply = new CritiqueReplyList();
             _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
@@ -246,7 +246,8 @@ namespace ReadRate.Controllers
                 {
                     SqlCommand cmd = new SqlCommand("GetCritiqueReplyById", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@CritiqueId", CritiqueId);
+                    Console.WriteLine(getReplyByCritiqueId.CritiqueId + "This is the id ");
+                    cmd.Parameters.AddWithValue("@CritiqueId", getReplyByCritiqueId.CritiqueId);
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     adapter.Fill(dt);
@@ -299,12 +300,12 @@ namespace ReadRate.Controllers
 
 
         [HttpPost, Route("[action]", Name = "CreatingCritiqueReply")]
-        public CritiqueWithReply CreatingCritiqueReply(CreateCritiqueReply critiqueReply)
+        public Result CreatingCritiqueReply(CreateCritiqueReply critiqueReply)
         {
             CritiqueWithReply critiqueWithReply = new CritiqueWithReply();
+            Result result = new Result();
             try
             {
-                int? UserId = Context.HttpContext.Session.GetInt32("UserId");
                 _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
                 _conn.Open();
                 using (_conn)
@@ -312,7 +313,7 @@ namespace ReadRate.Controllers
                     SqlCommand cmd = new SqlCommand("CreateCritiqueReply", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@CritiqueId", critiqueReply.CritiqueId);
-                    cmd.Parameters.AddWithValue("@UserId", UserId);
+                    cmd.Parameters.AddWithValue("@UserId", critiqueReply.userId);
                     cmd.Parameters.AddWithValue("@Reply", critiqueReply.Reply);
                     critiqueWithReply.critique = new UserCritique();
                     critiqueWithReply.critique = supplementaryController.GetCritiqueById(critiqueReply.CritiqueId);
@@ -334,6 +335,8 @@ namespace ReadRate.Controllers
                             criReply.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
                             critiqueWithReply.reply.Add(criReply);
                         }
+                        result.result = true;
+                        result.message = "Created";
                     }
                     else
                     {
@@ -341,6 +344,8 @@ namespace ReadRate.Controllers
                         critiqueWithReply.Result.result = true;
                         critiqueWithReply.Result.message = "Critique reply was not added";
                         Console.WriteLine("Critique reply was not added");
+                        result.result = false;
+                        result.message = "error";
                     }
                 }
             }
@@ -350,8 +355,10 @@ namespace ReadRate.Controllers
                 critiqueWithReply.Result.result = false;
                 critiqueWithReply.Result.message = ex.Message;
                 Console.WriteLine(ex.Message);
+                result.result = false;
+                result.message= ex.Message;
             }
-            return critiqueWithReply;
+            return result;
         }
 
         /*

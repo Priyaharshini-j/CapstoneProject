@@ -38,4 +38,8 @@
         public List<ReplyForCritique> Reply { get; set; }
         public Result Result { get; set; }
     }
+    public class getReplyByCritiqueId
+    {
+        public int CritiqueId { get; set; }
+    }
 }

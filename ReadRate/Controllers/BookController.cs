@@ -89,8 +89,8 @@ namespace ReadRate.Controllers
             return communities;
         }
 
-        [HttpGet, Route("[action]", Name = "UserCommunity")]
-        public List<BookCommunity> UserCommunityList()
+        [HttpPost, Route("[action]", Name = "UserCommunity")]
+        public List<BookCommunity> UserCommunityList(UserDetail userDetail)
         {
             List<BookCommunity> communities = new List<BookCommunity>();
             try
@@ -103,7 +103,7 @@ namespace ReadRate.Controllers
                     int? userId = Context.HttpContext.Session.GetInt32("UserId");
                     SqlCommand cmd = new SqlCommand("GetCommunityByUserId", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@UserId", userDetail.userId);
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     adapter.Fill(dt);
@@ -348,8 +348,8 @@ namespace ReadRate.Controllers
             return result;
         }
         */
-        [HttpGet, Route("[action]", Name = "BookInShelf")]
-        public List<BookInShelf> ListBookInShelf()
+        [HttpPost, Route("[action]", Name = "BookInShelf")]
+        public List<BookInShelf> ListBookInShelf(UserDetail userDetail)
         {
             List<BookInShelf> shelf = new List<BookInShelf>();
             int? userId = Context.HttpContext.Session.GetInt32("UserId");
@@ -361,7 +361,7 @@ namespace ReadRate.Controllers
                 {
                     SqlCommand cmd = new SqlCommand("ListBookInShelf", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@UserId", userDetail.userId);
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     adapter.Fill(dt);
@@ -444,7 +444,6 @@ namespace ReadRate.Controllers
         public Result RemoveBook(DeleteBookInShelf bookInShelf)
         {
             Result result = new Result();
-            int? userId = Context.HttpContext.Session.GetInt32("UserId");
             try
             {
                 _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
@@ -454,7 +453,7 @@ namespace ReadRate.Controllers
                     SqlCommand cmd = new SqlCommand("RemoveBook", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@BookShelfId", bookInShelf.BookShelfId);
-                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@UserId", bookInShelf.UserId);
                     cmd.Parameters.AddWithValue("@BookId", bookInShelf.BookId);
                     cmd.Parameters.AddWithValue("@ReadingStatus", bookInShelf.ReadingStatus);
                     cmd.ExecuteNonQuery();

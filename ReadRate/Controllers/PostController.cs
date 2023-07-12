@@ -167,23 +167,22 @@ namespace ReadRate.Controllers
         }
 
         [HttpPost, Route("[action]", Name = "CreatePost")]
-        public Result CreatePost(PostModel post)
+        public Result CreatePost(CreatePost post)
         {
-            int? UserId = Context.HttpContext.Session.GetInt32("UserId");
             Result result = new Result();
             try
             {
                 _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
                 _conn.Open();
-                int? userId = Context.HttpContext.Session.GetInt32("UserId");
+                int Bookid = supplementaryController.GetBookId(post.ISBN);
                 using (_conn)
                 {
                     SqlCommand cmd = new SqlCommand("CreatePost", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@PostCaption", post.PostCaption);
-                    cmd.Parameters.AddWithValue("@BookId", post.BookId);
+                    cmd.Parameters.AddWithValue("@BookId", Bookid);
                     cmd.Parameters.AddWithValue("@Picture", post.Picture);
-                    cmd.Parameters.AddWithValue("@UserId", UserId);
+                    cmd.Parameters.AddWithValue("@UserId", post.userId);
                     cmd.ExecuteNonQuery();
                     result.result = true;
                     result.message = "Successfully Posted a Picture";

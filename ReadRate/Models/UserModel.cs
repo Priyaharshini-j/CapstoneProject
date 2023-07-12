@@ -38,13 +38,15 @@ namespace ReadRate.Models
 
     public class UpdateModel
     {
-        
-        public string UserName { get; set; }
-        public string UserEmail { get; set; }   
+        public int UserId { get; set; }
         public string Password { get; set; }
         public string SecurityQn { get; set; }
         public string SecurityAns { get; set; }
     }
 
+    public class UserDetail
+    {
+        public int userId { get; set; }
+    }
 
 }

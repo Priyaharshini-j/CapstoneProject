@@ -1,17 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './NavigationComponent.css';
-import { Link } from 'react-router-dom';
-import { Menu, MenuItem, MenuList, MenuButton, IconButton} from '@chakra-ui/react';
-import { HamburgerIcon } from '@chakra-ui/icons';
-
+import { Link, useNavigate } from 'react-router-dom';
+import { Paper } from '@mui/material';
+import { BottomNavigation, BottomNavigationAction } from '@mui/material';
+import { Dashboard, Logout, PeopleAltTwoTone } from '@mui/icons-material';
 
 const NavigationComponent = () => {
-  const [isMenuOpen, setMenuOpen] = useState(false);
-  const userName = sessionStorage.getItem("userName");
+  const [value, setValue] = useState(0);
+  const navigate = useNavigate();
+  const [showPaper, setShowPaper] = useState(true);
+  const userName = sessionStorage.getItem('userName');
 
-  const toggleMenu = () => {
-    setMenuOpen(!isMenuOpen);
-  };
+  useEffect(() => {
+    const handleResize = () => {
+      const maxWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+      setShowPaper(maxWidth <= 1000);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (value === 1) {
+      navigate('/MyProfile');
+    } else if (value === 2) {
+      navigate('/dashboard');
+    } else if (value === 3) {
+      sessionStorage.clear();
+      navigate('/');
+    }
+  }, [value, navigate]);
 
   return (
     <React.Fragment>
@@ -20,45 +43,49 @@ const NavigationComponent = () => {
           <div className="dot"></div>
           <h3 className="heading">READ & RATE</h3>
         </header>
-        <nav className={isMenuOpen ? 'navigation-bar open' : 'navigation-bar'}>
-          <ul className='link'><Link className='link' to='/dashboard'>Dashboard</Link></ul>
-          {/* 
-          <ul className='link'><Link className='link' to='/community'>Community</Link></ul>
-          <ul className='link'><Link className='link' to='/critique'>Critique</Link></ul>*/}
-          <ul className='link'><Link className='link' to='/MyProfile'>My Profile</Link></ul>
-          <ul className='link'><Link className='link' to="/">Log Out</Link></ul>
-          <ul ><span>{userName}</span></ul>
-          
+        <nav className={showPaper ? 'navigation-bar' : 'navigation-bar hidden'}>
+          <ul className='link'>
+            <Link className='link' to='/dashboard'>
+              Dashboard
+            </Link>
+          </ul>
+          {/* Add more navigation links here */}
+          <ul className='link'>
+            <Link className='link' to='/MyProfile'>
+              My Profile
+            </Link>
+          </ul>
+          <ul className='link'>
+            <Link className='link' to="/">
+              Log Out
+            </Link>
+          </ul>
+          <ul>
+            <span>{userName}</span>
+          </ul>
         </nav>
-        <div className="hamburger-menu">
-          <Menu>
-            <MenuButton
-              onClick={toggleMenu}
-              className={`menu-icon${isMenuOpen ? 'open' : ''}`}
-              as={IconButton}
-              aria-label='Options'
-              icon={<HamburgerIcon />}
-              variant='outline'
-            />
-            <MenuList>
-              <MenuItem>
-                <Link className='link' to="/">Home</Link>
-              </MenuItem>
-              <MenuItem>
-                <Link className='link' to='/dashboard'>Dashboard</Link>
-              </MenuItem>
-              <MenuItem >
-                <Link className='link' to='/community'>Community</Link>
-              </MenuItem>
-              <MenuItem>
-                <Link className='link' to='/critique'>Critique</Link>
-              </MenuItem>
-              <MenuItem>
-                <Link className='link' to='/post'>Post</Link>
-              </MenuItem>
-            </MenuList>
-          </Menu>
-        </div>
+        {showPaper && (
+          <Paper
+            style={{
+              display: 'block',
+              maxWidth: '1000px',
+              position: 'fixed',
+              margin: '20px 0px 0px 0px',
+              bottom: '0',
+              left: '0',
+              right: '0',
+              elevation: 3,
+            }}
+            sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}
+            elevation={3}
+          >
+            <BottomNavigation showLabels value={value} onChange={(event, newValue) => setValue(newValue)}>
+              <BottomNavigationAction label="Profile" icon={<PeopleAltTwoTone />} />
+              <BottomNavigationAction label="Dashboard" icon={<Dashboard />} />
+              <BottomNavigationAction label="LogOut" icon={<Logout />} />
+            </BottomNavigation>
+          </Paper>
+        )}
       </div>
     </React.Fragment>
   );

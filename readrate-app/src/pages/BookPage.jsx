@@ -20,6 +20,7 @@ import { AutoStoriesOutlined, Edit, GroupAdd, PostAdd } from '@mui/icons-materia
 import Modal from '@mui/material/Modal';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
+import CreatePost from '../component/CreatePost/CreatePost';
 
 
 const style = {
@@ -56,6 +57,12 @@ function BookPage(props) {
     rating: location.state?.rating,
     genre: location.state?.genre,
     desc: location.state?.desc,
+  }
+
+
+  const [showCreatePost, setShowCreatePost] = useState(false);
+  const handleForm = () => {
+    setShowCreatePost(true);
   }
 
 
@@ -107,7 +114,7 @@ function BookPage(props) {
     }
     if (communityName !== null || communityDesc !== null) {
       const commRes = await axios.post("http://localhost:5278/Book/CreateCommunity", communityData);
-      
+
       if (commRes.data.result.result === true) {
         setCommAlert(true);
         setTimeout(() => {
@@ -137,7 +144,7 @@ function BookPage(props) {
       setCriAlert(true);
       handleClose();
     }
-    else{
+    else {
       setCriAlert(false);
     }
     handleClose();
@@ -154,9 +161,9 @@ function BookPage(props) {
     const shelfData = {
       book: {
         isbn: location.state?.bookIsbn,
-        bookName: location.state?.title,        
+        bookName: location.state?.title,
         genre: location.state?.genre,
-        author: location.state?.author,        
+        author: location.state?.author,
         coverUrl: location.state?.coverImage,
         bookDesc: location.state?.desc,
         publisher: location.state?.publisher,
@@ -251,9 +258,11 @@ function BookPage(props) {
                     <Button variant='outlined' color='error' onClick={handleClose}>Cancel</Button>
                   </Box>
                 </Modal>
-                <Fab variant='extended' color='info' onClick={handleOpen} ><Edit />&nbsp; Write Critique</Fab>
-                {/* 
-                <Fab variant='extended' color='secondary'> <PostAdd /> Share a Post</Fab> */}
+                <Fab variant='extended' color='info' onClick={handleOpen} ><Edit />&nbsp; Write Critique</Fab><Fab variant='extended' color='secondary' onClick={handleForm}>
+                  <PostAdd />
+                  Share Post
+                </Fab>
+                {showCreatePost && <CreatePost  isbn={details.isbn} openStatus={true}/>}
                 <Fab variant='extended' color='error' onClick={handleBookShelf}><AutoStoriesOutlined />Add to Shelf {isDropdownOpen ? "Close" : "Open"}</Fab>
 
                 {isDropdownOpen && (
@@ -262,13 +271,14 @@ function BookPage(props) {
                     setShelfReading(value);
                     handleAddingBook(value); // Call handleAddingBook without passing any parameter
                   }}
-                  
+
                   >
                     <MenuItem value={"Need To Read"}>Need To Read</MenuItem>
                     <MenuItem value={"Reading"}>Reading</MenuItem>
                     <MenuItem value={"Already Read"}>Already Read</MenuItem>
                   </Select>
                 )}
+
               </div>
               <div>
                 <br />
@@ -324,7 +334,7 @@ function BookPage(props) {
                 <Tab icon={<PeopleIcon color='primary' />} label="Community" value="1" />
                 <Tab icon={<ReviewsOutlinedIcon color='warning' />} label="Critique" value="2" />
                 {/* <Tab icon={<WallpaperOutlinedIcon color='info' />} label="Post" value="3" />*/}
-                
+
               </TabList>
             </Box>
             <TabPanel value="1">
@@ -343,7 +353,7 @@ function BookPage(props) {
               <CommunityComponent state={{ bookIsbn: details.isbn, title: details.title, author: details.author, publisher: details.publisher, publishedDate: details.publishedDate, buyLink: details.buyLink, coverImage: details.coverImage, rating: details.rating, genre: details.genre, desc: details.desc }} />
             </TabPanel>
             <TabPanel value="2">
-            {criAlert === true && (
+              {criAlert === true && (
                 <Alert severity="success">
                   <AlertTitle>Success</AlertTitle>
                   Successfully Created the Critique <strong>check it out in Your Profile Page!</strong>
@@ -362,7 +372,7 @@ function BookPage(props) {
               <PostComponent />
             </TabPanel>
             */}
-            
+
           </TabContext>
         </Box>
       </div>

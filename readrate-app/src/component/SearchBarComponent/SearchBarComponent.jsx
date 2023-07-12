@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './SearchBarComponent.css';
-import { Search2Icon } from '@chakra-ui/icons';
 import axios from 'axios';
 import { Card, CardBody, Heading, Image, Stack, Text } from '@chakra-ui/react';
 import { CircularProgress, IconButton, Rating } from '@mui/material';
-import { AddShoppingCart } from '@mui/icons-material';
+import { AddShoppingCart, SearchTwoTone } from '@mui/icons-material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Link } from 'react-router-dom';
 import BookComponent from '../BookComponent/BookComponent';
@@ -82,8 +81,9 @@ const SearchBarComponent = () => {
       <div className='search-component-container'>
         <div className="searchBox">
           <input className="searchInput" type="text" onChange={handleChange} placeholder="Search for books" />
+          
           <button className="searchButton" onClick={handleSubmit}>
-            <Search2Icon boxSize={9} />
+            <SearchTwoTone/>
           </button>
         </div>
         <div className="search-result-container">

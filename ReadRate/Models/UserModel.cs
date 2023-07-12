@@ -7,18 +7,27 @@ namespace ReadRate.Models
         public string UserEmail { get; set; }
         public string Password { get; set; }
 
+        public UserLogin(string userEmail, string password)
+        {
+            this.UserEmail = userEmail;
+            this.Password = password;
+        }
     }
 
     public class UserModel
     {
-        public int UserId { get; set; }
         public string UserName { get; set; }
+        public int UserId { get; set; }
         public string UserEmail { get; set; }
         public string Password { get; set; }
         public string SecurityQn { get; set; }
         public string SecurityAns { get; set; }
-        public Result result { get; set; }
+        public Models.Result result { get; set; }
 
+        public UserModel()
+        {
+            this.result = new Models.Result();
+        }
     }
 
     public class signUpModel

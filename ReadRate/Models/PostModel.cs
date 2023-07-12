@@ -15,9 +15,9 @@
     public class CreatePost
     {
         public string PostCaption { get; set; }
-        public byte[] Picture { get; set; }
+        public IFormFile Picture { get; set; }
         public string ISBN { get; set; }
-        public int userId { get; set; }
+        public int UserId { get; set; }
 
     }
 }

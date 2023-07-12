@@ -31,60 +31,50 @@ namespace ReadRate.Controllers
         public UserModel Login(UserLogin user)
         {
             UserModel userModel = new UserModel();
-            userModel.result = new Models.Result();
-            try
-            {
-                if (user != null && !string.IsNullOrWhiteSpace(user.UserEmail) && !string.IsNullOrWhiteSpace(user.Password))
-                {
-                    conn = new SqlConnection(_configuration["ConnectionStrings:SqlConn"]);
-                    conn.Open();
-                    using (conn)
-                    {
-                        SqlCommand cmd = new SqlCommand("ValidateLogin", conn);
-                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        cmd.Parameters.AddWithValue("@UserEmail", user.UserEmail);
-                        cmd.Parameters.AddWithValue("@UserPassword", user.Password);
-                        SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                        DataTable dt = new DataTable();
-                        adapter.Fill(dt);
 
-                        if (dt != null && dt.Rows.Count > 0)
-                        {
-                            userModel.UserName = dt.Rows[0]["UserName"].ToString();
-                            userModel.UserId = (int)dt.Rows[0]["UserId"];
-                            userModel.UserEmail = dt.Rows[0]["UserEmail"].ToString();
-                            userModel.Password = dt.Rows[0]["Password"].ToString();
-                            userModel.SecurityQn = dt.Rows[0]["SecurityQn"].ToString();
-                            userModel.SecurityAns = dt.Rows[0]["SecurityAns"].ToString();
-                            Context.HttpContext.Session.SetString("UserName", userModel.UserName);
-                            Context.HttpContext.Session.SetInt32("UserId", userModel.UserId);
-                            Context.HttpContext.Session.SetString("UserEmail", userModel.UserEmail);
-                            userModel.result.result = true;
-                            userModel.result.message = "success";
-                            Console.WriteLine("Success");
-                        }
-                        else
-                        {
-                            userModel.result.result = false;
-                            userModel.result.message = "Invalid userEmail or Passsword";
-                        }
+            if (user != null && !string.IsNullOrWhiteSpace(user.UserEmail) && !string.IsNullOrWhiteSpace(user.Password))
+            {
+                conn = new SqlConnection(_configuration["ConnectionStrings:SqlConn"]);
+                conn.Open();
+                using (conn)
+                {
+                    SqlCommand cmd = new SqlCommand("ValidateLogin", conn);
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@UserEmail", user.UserEmail);
+                    cmd.Parameters.AddWithValue("@UserPassword", user.Password);
+                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+
+                    if (dt != null && dt.Rows.Count > 0)
+                    {
+                        userModel.UserName = dt.Rows[0]["UserName"].ToString();
+                        userModel.UserId = (int)dt.Rows[0]["UserId"];
+                        userModel.UserEmail = dt.Rows[0]["UserEmail"].ToString();
+                        userModel.Password = dt.Rows[0]["Password"].ToString();
+                        userModel.SecurityQn = dt.Rows[0]["SecurityQn"].ToString();
+                        userModel.SecurityAns = dt.Rows[0]["SecurityAns"].ToString();
+                        userModel.result.result = true;
+                        userModel.result.message = "success";
+                        Console.WriteLine("Success");
+                    }
+                    else
+                    {
+                        userModel.result.result = false;
+                        userModel.result.message = "Invalid userEmail or Passsword";
                     }
                 }
-                else
-                {
-                    userModel.result.result = false;
-                    userModel.result.message = "Please enter username and password";
-                }
-                conn.Close();
             }
-            catch (Exception ex)
+            else
             {
                 userModel.result.result = false;
                 userModel.result.message = "Please enter username and password";
-                ex.Message.ToString();
             }
+            conn.Close();
+
             return userModel;
         }
+
         [HttpPost, Route("[action]", Name = "SignUp")]
         public Models.Result SignUp(signUpModel userModel)
         {

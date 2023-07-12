@@ -146,7 +146,7 @@ namespace ReadRate.Controllers
                 int? userId = Context.HttpContext.Session.GetInt32("UserId");
                 using (_conn)
                 {
-                    SqlCommand cmd = new SqlCommand("PostLikeDislike", _conn);
+                    SqlCommand cmd = new SqlCommand("CreatePostLikeDislike", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@UserId", userId);
                     cmd.Parameters.AddWithValue("PostId", postLike.post.PostId);
@@ -167,7 +167,7 @@ namespace ReadRate.Controllers
         }
 
         [HttpPost, Route("[action]", Name = "CreatePost")]
-        public Result CreatePost(CreatePost post)
+        public Result CreatePost([FromForm] CreatePost post)
         {
             Result result = new Result();
             try
@@ -175,17 +175,34 @@ namespace ReadRate.Controllers
                 _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
                 _conn.Open();
                 int Bookid = supplementaryController.GetBookId(post.ISBN);
+                Console.WriteLine(post.PostCaption);
+                Console.WriteLine("UserId", post.UserId);
+                Console.WriteLine("This is ISBN",post.ISBN);
+                Console.WriteLine("This is BookId", Bookid);
+                byte[] pictureData;
+                using (var memoryStream = new MemoryStream())
+                {
+                    post.Picture.CopyTo(memoryStream);
+                    pictureData = memoryStream.ToArray();
+                }
                 using (_conn)
                 {
                     SqlCommand cmd = new SqlCommand("CreatePost", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@PostCaption", post.PostCaption);
                     cmd.Parameters.AddWithValue("@BookId", Bookid);
-                    cmd.Parameters.AddWithValue("@Picture", post.Picture);
-                    cmd.Parameters.AddWithValue("@UserId", post.userId);
-                    cmd.ExecuteNonQuery();
-                    result.result = true;
-                    result.message = "Successfully Posted a Picture";
+                    cmd.Parameters.AddWithValue("@Picture", pictureData);
+                    cmd.Parameters.AddWithValue("@UserId", post.UserId);
+                    int rows = cmd.ExecuteNonQuery();
+                    if (rows > 0)
+                    {
+                        result.result = true;
+                        result.message = "Successfully Posted a Picture";
+                    }
+                    else{
+                        result.result = false;
+                        result.message = "Cannot Create";
+                    }
                 }
             }
             catch(Exception ex)

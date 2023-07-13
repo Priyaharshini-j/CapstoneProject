@@ -3,7 +3,7 @@
   left: 50%;
   transform: translate(-50%, 50%);
   background: #EEEEEE;
-  height: 52px;
+  height: 50px;
   border-radius: 40px;
   padding: 10px;
   width: 30%;
@@ -48,7 +48,7 @@
 @media screen and (max-width: 620px) {
   .searchBox:hover > .searchInput {
     width: 140px;
-    padding: 0 6px;
+    padding: 10px 6px;
   }
 }
 

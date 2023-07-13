@@ -1,13 +1,14 @@
 import { Card, CardBody, CardFooter, CardHeader, Heading, SimpleGrid, Text, color } from '@chakra-ui/react';
-import { Button, Divider, Fab, FormControl, Modal, TextareaAutosize } from '@mui/material'
-import { Box} from '@mui/material';
+import { Button, Divider, Fab, FormControl, IconButton, Modal, TextareaAutosize } from '@mui/material'
+import { Box } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom';
 import '../CommunityComponent/CommunityComponent.css'
-import { FavoriteRounded, HeartBroken, ReplyOutlined, SendOutlined } from '@mui/icons-material';
+import { DeleteOutlineOutlined, FavoriteRounded, HeartBroken, ReplyOutlined, SendOutlined } from '@mui/icons-material';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
+
 const CritiqueComponent = (props) => {
   const location = useLocation();
   const style = {
@@ -35,6 +36,19 @@ const CritiqueComponent = (props) => {
     Publisher: location.state?.publisher,
     PublishedDate: location.state?.publishedDate,
   };
+  const userName = sessionStorage.getItem("userName");
+
+  const handleDeleteCritique = async (critiqueId) => {
+    console.log(critiqueId)
+  }
+
+
+
+
+
+
+
+
 
   const [open, setOpen] = React.useState(false);
   const [ReplycritiqueId, setCritiqueId] = useState(null); // Track the critiqueId for sending the reply
@@ -62,14 +76,15 @@ const CritiqueComponent = (props) => {
         const response = await axios.post("http://localhost:5278/api/Critique/CreatingCritiqueReply", replyData);
         const data = response.data;
         if (data.result.result === true) {
-          setCriAlert(true);
           handleClose();
+          setCriAlert(true);
         } else {
           setCriAlert(false);
         }
         handleClose();
       } catch (error) {
         console.error("Error creating critique reply:", error);
+        setCriAlert(false);
       }
     }
   };
@@ -126,14 +141,14 @@ const CritiqueComponent = (props) => {
     }
 
     fetchCritiqueList();
-  }, [criAlert,alert]); // Empty dependency array to run the effect only once on page load
+  }, [criAlert, alert]); // Empty dependency array to run the effect only once on page load
 
   return (
     <React.Fragment>
       {criAlert === true && (
         <Alert severity="success">
           <AlertTitle>Success</AlertTitle>
-         Replied to the Critique— <strong>check it out by reloading the page!</strong>
+          Replied to the Critique— <strong>check it out by reloading the page!</strong>
         </Alert>
       )}
       {criAlert === false && (
@@ -169,8 +184,30 @@ const CritiqueComponent = (props) => {
             variant="filled"
             style={{ outline: `1px solid primary`, backgroundColor: "#c5bdf9", borderRadius: '5px' }}
           >
-            <CardHeader bg="gray.100" p={4}>
-              <Heading size="md">@{critique.userName}</Heading>
+            <CardHeader bg="gray.100" p={4} sx={{display:'flex' , flexDirection:'row', justifyContent:'space-between'}}>
+              <Heading size="md">@{critique.userName}
+                </Heading>
+              {
+                critique.userName === userName ? (<IconButton
+                  aria-label="bookmark Bahamas Islands"
+                  variant="plain"
+                  color="neutral"
+                  size="sm"
+                  onClick={() => handleDeleteCritique(critique.critiqueId)}
+                  sx={{ position: 'relative', right: '0.5rem' }}
+                >
+                  <DeleteOutlineOutlined color='error' />
+                </IconButton>) : (<IconButton
+                  aria-label="bookmark Bahamas Islands"
+                  variant="plain"
+
+                  color="neutral"
+                  size="sm"
+                  style={{ display: 'none' }}
+                  sx={{ position: 'absolute', right: '0.5rem', }}
+                >
+                  <DeleteOutlineOutlined color='error' />
+                </IconButton>)}
             </CardHeader>
             <CardBody>
               <Text>{critique.critiqueDesc}</Text>
@@ -197,8 +234,7 @@ const CritiqueComponent = (props) => {
                       <FavoriteRounded color="error" />
                     </Fab>
                     &nbsp;{critique.like} Like
-                    &nbsp; &nbsp;
-                    <Fab
+                    {/* <Fab
                       variant="extended"
                       size="small"
                       color="#5BC0F8"
@@ -206,8 +242,7 @@ const CritiqueComponent = (props) => {
                       onClick={() => handleLike(-1, critique.critiqueId)}
                     >
                       <HeartBroken color="error" />
-                    </Fab>
-                    &nbsp;{critique.dislike} DisLike
+                    </Fab>*/}
                     <br />
                     <br />
                     <Fab
@@ -226,17 +261,17 @@ const CritiqueComponent = (props) => {
                   </div>
                 </div>
                 {critiqueReplies[critique.critiqueId] && critiqueReplies[critique.critiqueId].length > 0 && (
-                  <div>
+                  <Box sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex', flexDirection: 'column', flexWrap: 'wrap', borderRadius: '5px' }}>
                     {critiqueReplies[critique.critiqueId].map((reply) => (
-                      <Card key={reply.critiqueReplyId} variant={'outline'} boxShadow={'2px 2px rgba(0,0,0,0.7)'} style={{ backgroundColor: "#EEEEEE", padding: '8px 10px', margin: '9px 0px 10px 20px' }}>
-                        <CardBody><p style={{ fontSize: '20px' }}>{reply.reply}</p></CardBody>
-                        <CardFooter><span>Created By: @{reply.userName}</span>&nbsp;&nbsp;
-                          <span>Created On: {new Date(reply.createdDate).toLocaleDateString()}</span>
+                      <Card key={reply.critiqueReplyId} variant={'outline'} boxShadow={'2px 2px rgba(0,0,0,0.7)'} style={{ borderRadius: '5px', backgroundColor: "#EEEEEE", padding: '0px 10px', margin: '3px 0px 10px 20px', width: '450px', }}>
+                        <CardBody><p style={{ fontSize: '17px', fontFamily: 'IBM Plex Sans' }}>{reply.reply}</p></CardBody>
+                        <CardFooter style={{ fontSize: '14px' }}><span>Created By: @{reply.userName}</span>&nbsp;&nbsp;
+                          <span style={{ fontSize: '14px' }}>Created On: {new Date(reply.createdDate).toLocaleDateString()}</span>
                         </CardFooter>
                         <Divider variant="middle" />
                       </Card>
                     ))}
-                  </div>
+                  </Box>
                 )}
                 {replyAlert === false && (
                   <Alert severity="warning">
@@ -255,12 +290,12 @@ const CritiqueComponent = (props) => {
               <Box sx={style}>
                 <h3>Share Your Comment</h3>
                 <FormControl>
-                  <TextareaAutosize minLength={10} minRows={2} variant='filled' placeholder='Write Critique Reply' required value={Reply}
+                  <TextareaAutosize style={{ width: '300px' }} minRows={7} variant='filled' placeholder='Write Critique Reply' required value={Reply}
                     onChange={(e) => setCriReply(e.target.value)} />
                 </FormControl>
                 <br />
-                <Button variant='outlined' color='secondary' onClick={handleSubmit} >Save</Button>
-                <Button variant='outlined' color='error' onClick={handleClose}>Cancel</Button>
+                <Button variant='outlined' color='secondary' style={{ margin: '10px 20px' }} onClick={handleSubmit} >Save</Button>
+                <Button variant='outlined' color='error' style={{ margin: '10px 20px' }} onClick={handleClose}>Cancel</Button>
               </Box>
             </Modal>
 

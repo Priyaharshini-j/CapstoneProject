@@ -292,7 +292,6 @@ function BookPage(props) {
                   onChange={handleRate}
                   size="large"
                   align="center"
-                  justifyContent="center"
                 />
               </div>
               {

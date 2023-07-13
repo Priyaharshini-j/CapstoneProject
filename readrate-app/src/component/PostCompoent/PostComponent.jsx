@@ -20,11 +20,69 @@ const PostComponent = (props) => {
     Publisher: location.state?.publisher,
     PublishedDate: location.state?.publishedDate,
   };
-  const [postList, setPost] = useState(null);
-  const [isFavorite, setIsFavorite] = useState(false);
 
-  const handleFavoriteClick = () => {
-    setIsFavorite(!isFavorite);
+
+
+  const [postList, setPost] = useState(null);
+  const [deleteAlert, setDeleteAlert] = useState(null);
+  const handleDeletePost = async(postId) => {
+    const deleteData = {
+      data: {
+        postId: postId,
+        userId: parseInt(userId)
+      }
+    };
+    try {
+      console.log(deleteData);
+      const deletePost = await axios.delete("http://localhost:5278/api/Post/DeletePost",
+        deleteData)
+      if (deletePost.data.result === true) {
+        setDeleteAlert(true);
+      }
+    }
+    catch (error) {
+      setDeleteAlert(false);
+    }
+  }
+
+
+
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [LikeAlert, setAlert] = useState(null);
+  const handleFavoriteClick = async (postId) => {
+    const data = {
+      userId: userId,
+      postId: postId,
+      likeStatus: 1
+    }
+    try {
+      const likeResponse = await axios.post(
+        "http://localhost:5278/api/Post/AddPostLikeDislike",
+        data
+      );
+
+      if (likeResponse.data.result === true) {
+        // Find the index of the post in the postList
+        const postIndex = postList.findIndex((post) => post.postId === postId);
+
+        if (postIndex !== -1) {
+          // Create a copy of the postList array
+          const updatedPostList = [...postList];
+
+          // Toggle the isFavorite property of the specific post
+          updatedPostList[postIndex].isFavorite = !updatedPostList[postIndex]
+            .isFavorite;
+          setAlert(false);
+          // Update the postList state with the modified array
+          setPost(updatedPostList);
+        }
+      }
+    }
+    catch (error) {
+      setAlert(true);
+      console.log(error);
+    }
+
   };
   useEffect(() => {
     async function fetchPost() {
@@ -38,7 +96,7 @@ const PostComponent = (props) => {
       }
     }
     fetchPost();
-  }, []);
+  }, [LikeAlert,deleteAlert]);
 
   if (postList === null) {
     return <CircularProgress />;
@@ -52,7 +110,28 @@ const PostComponent = (props) => {
   } else {
     return (
       <React.Fragment>
+        {
+          deleteAlert === true && (
+            <Alert severity="success">
+              <AlertTitle>Success</AlertTitle>
+              Success — <strong>Successfully deleted the post of Yours</strong>
+            </Alert>
+          )
+        }
+        {deleteAlert === false && (
+          <Alert severity="error">
+            <AlertTitle>Error</AlertTitle>
+            This is an error alert — <strong>Error in deleting your post</strong>
+          </Alert>
+        )}
+        {LikeAlert === false && (
+          <Alert severity="error">
+            <AlertTitle>Error</AlertTitle>
+            This is an error alert — <strong>You were already Liked this Post</strong>
+          </Alert>
+        )}
         <div className='Postcard-container' style={{ background: 'rgb(229 237 255)' }}>
+
           {postList.map((post) => {
             const pictureData = post.picture;
             const pictureUrl = `data:image/jpeg;base64,${pictureData}`;
@@ -60,7 +139,7 @@ const PostComponent = (props) => {
             return (
 
 
-              <Card key={post.postId} sx={{ maxWidth: 345, height:'auto', background: '#e3c0f1', '&:hover': { transform: 'scale(1.02)' }, alignItems: 'center', margin: '7px 0px', boxShadow: '1px 1px 5px 5px #ddd', justifyContent:'space-evenly' }}>
+              <Card key={post.postId} sx={{ maxWidth: 345, height: 'auto', background: '#e3c0f1', '&:hover': { transform: 'scale(1.02)' }, alignItems: 'center', margin: '7px 0px', boxShadow: '1px 1px 5px 5px #ddd', justifyContent: 'space-evenly' }}>
                 <CardHeader
                   style={{ background: 'rgb(245 239 253)', borderRadius: '3px' }}
                   avatar={
@@ -71,28 +150,29 @@ const PostComponent = (props) => {
                   title={post.userName}
                   subheader={new Date(post.createdDate).toLocaleDateString()}
                   action={
-                    post.userName === userName? (<IconButton
+                    post.userName === userName ? (<IconButton
                       aria-label="bookmark Bahamas Islands"
                       variant="plain"
                       color="neutral"
                       size="sm"
+                      onClick={() => handleDeletePost(post.postId)}
                       sx={{ position: 'relative', right: '0.5rem' }}
                     >
                       <DeleteOutlineOutlined color='error' />
-                    </IconButton>): (<IconButton
+                    </IconButton>) : (<IconButton
                       aria-label="bookmark Bahamas Islands"
                       variant="plain"
-                      
+
                       color="neutral"
                       size="sm"
-                      style={{display:'none'}}
-                      sx={{ position: 'absolute', right: '0.5rem',}}
+                      style={{ display: 'none' }}
+                      sx={{ position: 'absolute', right: '0.5rem', }}
                     >
                       <DeleteOutlineOutlined color='error' />
                     </IconButton>)}
 
                 />
-                
+
 
                 <CardMedia
                   component="img"
@@ -105,9 +185,13 @@ const PostComponent = (props) => {
                   <Stack direction={'row'} spacing={1} style={{ alignItems: 'center', justifyContent: 'flex-start' }}>
                     <IconButton
                       aria-label="add to favorites"
-                      onClick={handleFavoriteClick}
+                      onClick={() => handleFavoriteClick(post.postId)}
                     >
-                      {isFavorite ? <Favorite color='error' /> : <FavoriteBorderOutlined color='error' />}<span>{post.like}</span>
+                      {post.isFavorite ? (
+                        <Favorite color='error' />
+                      ) : (
+                        <FavoriteBorderOutlined color='error' />
+                      )}
                     </IconButton>
                     <Typography variant="body2" color="text.secondary" style={{ justifyContent: 'center', alignItems: 'items' }}>
                       {post.postCaption}

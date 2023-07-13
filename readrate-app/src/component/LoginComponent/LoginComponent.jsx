@@ -40,11 +40,6 @@ const LoginComponent = () => {
 
   return (
     <React.Fragment>
-      <div class="lines">
-        <div class="line"></div>
-        <div class="line"></div>
-        <div class="line"></div>
-      </div>
       <div className='login-container'>
 
         <div className="card">
@@ -54,6 +49,7 @@ const LoginComponent = () => {
             <input
               className="input-box"
               type="email"
+              style={{height: '35px', width: '300px'}}
               placeholder="Email"
               onChange={(e) => setUserEmail(e.target.value)}
             />
@@ -62,6 +58,7 @@ const LoginComponent = () => {
             <input
               className="input-box"
               type="password"
+              style={{height: '35px', width: '300px'}}
               placeholder="Password"
               onChange={(e) => setPassword(e.target.value)}
             />

@@ -1,8 +1,6 @@
-.Postcard-container{
+.Postcard-container {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  column-gap: 10px;
+  flex-direction: column;
   justify-content: center;
-  align-content: center;
+  align-items: center;
 }

@@ -15,8 +15,7 @@ export const SignupComponent = () => {
   const [logIn, setLogIn] = useState(false)
 
   const handleSignUp = async () => {
-    if(userName === null || userEmail === null || password=== null || confirmPassword === null || securityQn === null ||securityAns === null)
-    {
+    if (userName === null || userEmail === null || password === null || confirmPassword === null || securityQn === null || securityAns === null) {
       alert("Fill all the fields");
     }
     if (password === confirmPassword && password !== null && confirmPassword !== null) {
@@ -30,10 +29,10 @@ export const SignupComponent = () => {
       console.log(data);
       const res = await axios.post("http://localhost:5278/User/SignUp", data);
       console.log(res.data.result);
-      if(res.data.result === true){
-       navigate('/');
+      if (res.data.result === true) {
+        setLogIn(true)
       }
-      else{
+      else {
         alert(res.data.message);
       }
     }
@@ -44,6 +43,8 @@ export const SignupComponent = () => {
   }
 
   if (logIn) {
+
+    navigate('/');
     return <LoginComponent />;
   }
 

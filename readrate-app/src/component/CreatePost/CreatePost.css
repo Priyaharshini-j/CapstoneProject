@@ -7,3 +7,11 @@
   align-items: center;
   justify-content: space-evenly;
 }
+
+input{
+  width: 270px;    
+  font-size: 0.75em;
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.25em;
+}
+

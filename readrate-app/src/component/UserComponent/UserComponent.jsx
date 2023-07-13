@@ -2,10 +2,19 @@ import React, { useState } from 'react';
 import { DeleteForeverOutlined, Edit, Password } from '@mui/icons-material';
 import { Alert, AlertTitle, Box, Button, Fab, FormControl, Modal } from '@mui/material';
 import './UserComponent.css'
-import avatar1 from '../images/woman.png'
-import avatar3 from '../images/man1.png'
-import avatar4 from '../images/man2.png'
-import avatar2 from '../images/female2.png'
+import avatar1 from '../images/avatars/avatar1.png'
+import avatar3 from '../images/avatars/avatar2.png'
+import avatar4 from '../images/avatars/avatar3.png'
+import avatar2 from '../images/avatars/avatar4.png'
+import avatar5 from '../images/avatars/avatar5.png'
+import avatar6 from '../images/avatars/avatar6.png'
+import avatar7 from '../images/avatars/avatar7.png'
+import avatar8 from '../images/avatars/avatar8.png'
+import avatar9 from '../images/avatars/avatar9.png'
+import avatar10 from '../images/avatars/avatar10.png'
+import avatar12 from '../images/avatars/avatar11.png'
+import avatar13 from '../images/avatars/avatar12.png'
+import avatar11 from '../images/avatars/avatar13.png'
 
 import axios from 'axios';
 import { useNavigate } from 'react-router';
@@ -34,7 +43,15 @@ const UserComponent = () => {
     avatar2,
     avatar3,
     avatar4,
-    // Add more image sources as needed
+    avatar5,
+    avatar6,
+    avatar7,
+    avatar8,
+    avatar9,
+    avatar10,
+    avatar11,
+    avatar12,
+    avatar13
   ];
   const getRandomAvatarIndex = () => {
     return Math.floor(Math.random() * avatarSources.length);
@@ -97,7 +114,7 @@ const UserComponent = () => {
     <React.Fragment>
       <div className='user-container'>
         <div className='image-container'>
-          <img src={randomAvatarSrc} alt='Avatar' width={'200px'} border={'0.25mm dashed #000'} />
+          <img src={randomAvatarSrc} alt='Avatar' width={'200px'} style={{border:'0.25em dashed #000'}}/>
         </div>
 
         <div>
@@ -156,8 +173,8 @@ const UserComponent = () => {
               />
             </FormControl>
             <br />
-            <Button variant='outlined' color='secondary' onClick={handleSubmit} >Save</Button>
-            <Button variant='outlined' color='error' onClick={handleClose}>Cancel</Button>
+            <Button variant='outlined' style={{margin:'20px 40px'}} color='secondary' onClick={handleSubmit} >Save</Button>
+            <Button variant='outlined' style={{margin:'20px 40px'}} color='error' onClick={handleClose}>Cancel</Button>
           </Box>
         </Modal>
         {deleteAlert === false && (

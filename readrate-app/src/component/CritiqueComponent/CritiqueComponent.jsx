@@ -126,7 +126,7 @@ const CritiqueComponent = (props) => {
     }
 
     fetchCritiqueList();
-  }, []); // Empty dependency array to run the effect only once on page load
+  }, [criAlert,alert]); // Empty dependency array to run the effect only once on page load
 
   return (
     <React.Fragment>
@@ -159,7 +159,7 @@ const CritiqueComponent = (props) => {
           noCritiqueAlert === true && (
             <Alert severity="info">
               <AlertTitle>Info</AlertTitle>
-              <strong>No critique Found for this Book</strong>
+              No critique Found for this Book <strong>Be the first to state the facts about book...</strong>
             </Alert>
           )
         }

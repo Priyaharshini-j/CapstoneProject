@@ -61,7 +61,7 @@ const NavigationComponent = () => {
             </Link>
           </ul>
           <ul>
-            <span>{userName}</span>
+            <span>@{userName}</span>
           </ul>
         </nav>
         {showPaper && (

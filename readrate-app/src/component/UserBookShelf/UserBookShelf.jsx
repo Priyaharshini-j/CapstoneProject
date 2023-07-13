@@ -108,7 +108,7 @@ const UserBookShelf = () => {
             </div>
             <Fab variant='extended' color='error' onClick={() => handleRemoveBook(rate.bookShelfId, rate.book.bookId, rate.bookShelfName)}>
               <DeleteForeverOutlined />
-              &nbsp; Delete Profile
+              &nbsp; Remove Book
             </Fab>
           </div>
         ))

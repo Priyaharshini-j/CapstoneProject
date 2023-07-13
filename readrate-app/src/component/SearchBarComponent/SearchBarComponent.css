@@ -3,20 +3,20 @@
   left: 50%;
   transform: translate(-50%, 50%);
   background: #EEEEEE;
-  height: 30px;
+  height: 52px;
   border-radius: 40px;
   padding: 10px;
   width: 30%;
 }
 
 .searchBox:hover > .searchInput {
-  width: 200px;
+  width: 320px;
   padding: 0 6px;
 }
 
 .searchBox:hover > .searchButton {
-  background: white;
-  color: #00ADB5;
+  background:#dacff5 ;
+  color: rgb(20, 20, 20);
 }
 
 .searchButton {
@@ -66,7 +66,7 @@
   column-gap: 15px;font-family: 'Playfair Display', serif;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1300px) {
   .search-component-container .search-container {
     grid-template-columns: 1fr;
   }

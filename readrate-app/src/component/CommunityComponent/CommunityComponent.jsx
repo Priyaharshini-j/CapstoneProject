@@ -1,6 +1,6 @@
 import { AddIcon } from '@chakra-ui/icons';
 import { Card, CardBody, CardHeader, Heading, SimpleGrid, Text, color } from '@chakra-ui/react';
-import {Alert, AlertTitle, Fab} from '@mui/material'
+import {Alert, AlertTitle, CircularProgress, Fab} from '@mui/material'
 import { Box, colors } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
@@ -52,16 +52,14 @@ const CommunityComponent = (props) => {
     async function fetchCommunityList() {
       const res = await axios.post("http://localhost:5278/Book/CommunityList", book);
       setCommunityList(res.data);
-      console.log(communityList);
     }
-
     fetchCommunityList();
-  }, []); // Empty dependency array to run the effect only once on page load
+  }, [alert]); // Empty dependency array to run the effect only once on page load
 
   if (communityList === null) {
-    return <div>Loading...</div>;
+    return <CircularProgress/>;
   } else if (communityList[0].communityId === 0) {
-    return <div>No Community Found</div>;
+    return (<Alert severity='info'><AlertTitle>Info</AlertTitle> No Community Found on this book... <strong>Be the first to create your turf</strong></Alert>);
   } else {
     return (
       <React.Fragment>

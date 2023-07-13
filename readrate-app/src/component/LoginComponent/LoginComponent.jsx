@@ -8,7 +8,7 @@ const LoginComponent = () => {
   const [UserEmail, setUserEmail] = useState("");
   const [Password, setPassword] = useState("");
   const [signUp, setSignUp] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);  
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
   const handleLogin = async () => {
     const data = {
@@ -16,7 +16,7 @@ const LoginComponent = () => {
       password: Password,
     };
 
-    const res = await axios.post("https://readrate-app.azurewebsites.net/User/Login", data);
+    const res = await axios.post("http://localhost:5278/User/Login", data);
     console.log(res.data.result.result);
     if (res.data.result.result === true) {
       sessionStorage.setItem("userId", res.data.userId);
@@ -40,28 +40,34 @@ const LoginComponent = () => {
 
   return (
     <React.Fragment>
-      <div class='login-container'>
-        <div class="card">
-          <h3 class="card-heading">Login To Your Account</h3>
-          <div class="card-body">
-            <label class="label-body">Email:</label>
+      <div class="lines">
+        <div class="line"></div>
+        <div class="line"></div>
+        <div class="line"></div>
+      </div>
+      <div className='login-container'>
+
+        <div className="card">
+          <h3 className="card-heading">Login To Your Account</h3>
+          <div className="card-body">
+            <label className="label-body">Email:</label>
             <input
-              class="input-box"
+              className="input-box"
               type="email"
               placeholder="Email"
               onChange={(e) => setUserEmail(e.target.value)}
             />
 
-            <label class="label-body">Password:</label>
+            <label className="label-body">Password:</label>
             <input
-              class="input-box"
+              className="input-box"
               type="password"
               placeholder="Password"
               onChange={(e) => setPassword(e.target.value)}
             />
-            <div class="button-container">
-              <button class="button" onClick={handleLogin}>Login</button>
-              <button class="button" onClick={(e) => setSignUp(true)}>SignUp</button>
+            <div className="button-container">
+              <button className="button" onClick={handleLogin}>Login</button>
+              <button className="button" onClick={(e) => setSignUp(true)}>SignUp</button>
             </div>
           </div>
         </div>

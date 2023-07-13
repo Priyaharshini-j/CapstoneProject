@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: 1fr 4fr;
   font-family: 'IBM Plex Sans', sans-serif;
-  box-shadow: 4px 2px 2px 2px rgb(193, 164, 247);
+  box-shadow: 1px 1px 5px 5px rgb(193, 164, 247);
   border-radius: 5px;
   padding: 0px 30px;
   align-items: center;

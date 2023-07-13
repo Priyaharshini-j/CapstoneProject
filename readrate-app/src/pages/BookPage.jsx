@@ -81,6 +81,7 @@ function BookPage(props) {
     submitRating(newValue); // Pass the new value to submitRating()
   };
   const [alert, setAlert] = useState(null);
+
   const submitRating = async (newValue) => { // Accept the new value as a parameter
     const data = {
       ISBN: location.state?.bookIsbn,
@@ -142,6 +143,7 @@ function BookPage(props) {
     if (critiqueDesc !== '') {
       axios.post("http://localhost:5278/api/Critique/CreatingCritique", data);
       setCriAlert(true);
+      
       handleClose();
     }
     else {
@@ -232,12 +234,12 @@ function BookPage(props) {
                         placeholder='Name Your Community'
                         onChange={(e) => setCommunityName(e.target.value)}
                       />
-                      <TextareaAutosize sx={{ bgcolor: 'white', color: 'black', borderRadius: '5px', width: '380' }} minRows={4} variant='filled' placeholder='Make people to understand about your community' required value={communityDesc}
+                      <TextareaAutosize  style={{width:'320px', margin:'20px 0px'}} minRows={7}variant='filled' placeholder='Make people to understand about your community' required value={communityDesc}
                         onChange={(e) => setCommunityDesc(e.target.value)} />
                     </FormControl>
                     <br />
-                    <Button variant='outlined' color='secondary' onClick={handleCreateCommunity} >Save</Button> &nbsp; &nbsp;
-                    <Button variant='outlined' color='error' onClick={handleCommunityClose}>Cancel</Button>
+                    <Button variant='outlined' style={{margin:'0px 20px', }} sx={{'&:hover':{transform:'scale(1.02)'}}} color='secondary' onClick={handleCreateCommunity} >Save</Button>
+                    <Button variant='outlined' style={{margin:'0px 20px'}} sx={{'&:hover':{transform:'scale(1.02)'}}} color='error' onClick={handleCommunityClose}>Cancel</Button>
                   </Box>
                 </Modal>
                 <Fab variant='extended' color='warning' onClick={handleCommunityOpen}><GroupAdd /> &nbsp;Create Community</Fab>
@@ -250,20 +252,20 @@ function BookPage(props) {
                   <Box sx={style}>
                     <h3>Share Your Thoughts</h3>
                     <FormControl>
-                      <TextareaAutosize minLength={10} minRows={2} variant='filled' placeholder='Write the Critique' required value={critiqueDesc}
+                      <TextareaAutosize style={{width:'320px', margin:'20px 0px'}} minRows={7}  variant='filled' placeholder='Write the Critique' required value={critiqueDesc}
                         onChange={(e) => setCritiqueDesc(e.target.value)} />
                     </FormControl>
                     <br />
-                    <Button variant='outlined' color='secondary' onClick={handleSubmit} >Save</Button>
-                    <Button variant='outlined' color='error' onClick={handleClose}>Cancel</Button>
+                    <Button variant='outlined' style={{margin:'0px 40px'}} sx={{'&:hover':{transform:'scale(1.02)'}}}color='secondary' onClick={handleSubmit} >Save</Button>
+                    <Button variant='outlined' style={{margin:'0px 40px'}} color='error' sx={{'&:hover':{transform:'scale(1.02)'}}} onClick={handleClose}>Cancel</Button>
                   </Box>
                 </Modal>
                 <Fab variant='extended' color='info' onClick={handleOpen} ><Edit />&nbsp; Write Critique</Fab><Fab variant='extended' color='secondary' onClick={handleForm}>
                   <PostAdd />
                   Share Post
                 </Fab>
-                {showCreatePost && <CreatePost  isbn={details.isbn} openStatus={true}/>}
-                <Fab variant='extended' color='error' onClick={handleBookShelf}><AutoStoriesOutlined />Add to Shelf {isDropdownOpen ? "Close" : "Open"}</Fab>
+                {showCreatePost && <CreatePost  isbn={details.isbn} openStatus={false}/>}
+                <Fab variant='extended' color='error' onClick={handleBookShelf}><AutoStoriesOutlined />Add to Shelf</Fab>
 
                 {isDropdownOpen && (
                   <Select value={ShelfReading} onChange={(event) => {
@@ -333,7 +335,7 @@ function BookPage(props) {
                 indicatorColor="secondary" centered >
                 <Tab icon={<PeopleIcon color='primary' />} label="Community" value="1" />
                 <Tab icon={<ReviewsOutlinedIcon color='warning' />} label="Critique" value="2" />
-                {/* <Tab icon={<WallpaperOutlinedIcon color='info' />} label="Post" value="3" />*/}
+                <Tab icon={<WallpaperOutlinedIcon color='info' />} label="Post" value="3" />
 
               </TabList>
             </Box>
@@ -367,11 +369,9 @@ function BookPage(props) {
               )}
               <CritiqueComponent state={{ bookIsbn: details.isbn, title: details.title, author: details.author, publisher: details.publisher, publishedDate: details.publishedDate, buyLink: details.buyLink, coverImage: details.coverImage, rating: details.rating, genre: details.genre, desc: details.desc }} />
             </TabPanel>
-            {/*
             <TabPanel value="3">
-              <PostComponent />
+              <PostComponent state={{bookIsbn: details.isbn, title: details.title, author: details.author, publisher: details.publisher, publishedDate: details.publishedDate, buyLink: details.buyLink, coverImage: details.coverImage, rating: details.rating, genre: details.genre, desc: details.desc}}/>
             </TabPanel>
-            */}
 
           </TabContext>
         </Box>

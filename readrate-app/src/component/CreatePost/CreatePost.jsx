@@ -2,6 +2,7 @@ import { Box, Button, FormControl, Modal } from '@mui/material';
 import axios from 'axios';
 import React, { useState } from 'react';
 import '../CreatePost/CreatePost.css'
+import { UploadFileOutlined, UploadFileRounded, UploadFileTwoTone } from '@mui/icons-material';
 
 const CreatePost = (props) => {
 
@@ -22,7 +23,7 @@ const CreatePost = (props) => {
   };
   const default_isbn = props.isbn;
   const openStatus = props.openStatus
-  const [open, setOpen] = React.useState(openStatus);
+  const [open, setOpen] = React.useState(!openStatus);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const [postCaption, setPostCaption] = useState('');
@@ -57,6 +58,7 @@ const CreatePost = (props) => {
       console.log(res.data);
       if (res.data.result === true) {
         handleClose();
+
       }
     } catch (error) {
       console.error(error);
@@ -85,15 +87,15 @@ const CreatePost = (props) => {
                 />
               </div>
               <div>
-              <label htmlFor='isbn'>ISBN</label>
-              <input
-                type='text'
-                id='isbn'
-                value={isbn}
-                disabled
-              />
+                <label htmlFor='isbn'>ISBN</label>
+                <input
+                  type='text'
+                  id='isbn'
+                  value={isbn}
+                  disabled
+                />
               </div>
-              
+
               <div>
                 <label htmlFor="postCaption">Post Caption:</label>
                 <input
@@ -103,27 +105,22 @@ const CreatePost = (props) => {
                   onChange={handlePostCaptionChange}
                 />
               </div>
-             
-              <br />
-              <br />
-              <br />
-            </div><br />
+            </div>
             <div>
               <label htmlFor="picture">Picture:</label>
-              <input
+              <input  style={{height:'auto', margin:'10px 25px 0px 25px' }}
                 type="file"
                 id="picture"
                 accept="image/*"
                 onChange={handlePictureChange}
               />
             </div>
-            <button type="submit">Create Post</button>
+
+            <Button color='secondary' variant='outlined' style={{margin: '0px 10px'}} type="submit"> <UploadFileRounded />Create Post</Button>
+            <Button variant='outlined' color='error' style={{margin: '0px 10px'}} onClick={handleClose}>Cancel</Button>
           </div>
 
         </form>
-        <br />
-        <Button variant='outlined' color='secondary' onClick={handleSubmit} >Save</Button>
-        <Button variant='outlined' color='error' onClick={handleClose}>Cancel</Button>
       </Box>
     </Modal>
 

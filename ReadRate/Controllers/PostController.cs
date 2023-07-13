@@ -30,28 +30,28 @@ namespace ReadRate.Controllers
             int bookId = await supplementaryController.getBookIdByISBN(book);
             try
             {
-                using(_conn)
+                using (_conn)
                 {
                     SqlCommand cmd = new SqlCommand("GetPostByBookId", _conn);
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@BookId", bookId);
-                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-                    if (dt != null && dt.Rows.Count > 0)
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    if (reader.HasRows)
                     {
                         Console.WriteLine("Post Found");
-                        foreach (DataRow dr in dt.Rows)
+                        while (reader.Read())
                         {
                             PostModel post = new PostModel();
-                            post.PostId = Convert.ToInt32(dr["CritiqueId"]);
-                            post.PostCaption = dr["PostCaption"].ToString();
-                            post.UserId = Convert.ToInt32(dr["UserId"]);
-                            post.BookId = Convert.ToInt32(dr["BookId"]);
+                            post.PostId = Convert.ToInt32(reader["PostId"]);
+                            post.PostCaption = reader["PostCaption"].ToString();
+                            post.UserId = Convert.ToInt32(reader["UserId"]);
+                            post.UserName = supplementaryController.FetchNameById(post.UserId);
+                            post.BookId = Convert.ToInt32(reader["BookId"]);
                             post.Like = supplementaryController.GetPostLikeDislike(post.PostId)[1];
                             post.DisLike = supplementaryController.GetPostLikeDislike(post.PostId)[0];
-                            post.Picture = (byte[])dr["Picture"];
-                            post.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                            post.Picture = (byte[])reader["Picture"];
+                            post.CreatedDate = Convert.ToDateTime(reader["CreatedDate"]);
                             postList.Add(post);
                         }
                     }
@@ -64,6 +64,8 @@ namespace ReadRate.Controllers
                         postList.Add(post);
                         Console.WriteLine("No Post found for this book");
                     }
+
+                    reader.Close();
                 }
             }
             catch (Exception ex)
@@ -77,6 +79,7 @@ namespace ReadRate.Controllers
             }
             return postList;
         }
+
 
         [HttpGet, Route("[action]", Name = "UserPost")]
         public List<PostModel> UsersPost()
@@ -143,17 +146,26 @@ namespace ReadRate.Controllers
             {
                 _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
                 _conn.Open();
-                int? userId = Context.HttpContext.Session.GetInt32("UserId");
                 using (_conn)
                 {
                     SqlCommand cmd = new SqlCommand("CreatePostLikeDislike", _conn);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@UserId", userId);
-                    cmd.Parameters.AddWithValue("PostId", postLike.post.PostId);
-                    cmd.Parameters.AddWithValue("LikeStatus", postLike.likeStatus);
-                    cmd.ExecuteNonQuery();
+                    cmd.Parameters.AddWithValue("@UserId", postLike.UserId);
+                    cmd.Parameters.AddWithValue("@PostId", postLike.PostId);
+                    cmd.Parameters.AddWithValue("@LikeStatus", postLike.LikeStatus);
+                    int rows = cmd.ExecuteNonQuery();
+                    if (rows > 0)
+                    {
+                        result.result = true;
+                        result.message = postLike.LikeStatus == 1 ? "Liked a Post" : "Disliked a Post";
+                    }
+                    else
+                    {
+                        result.result = false;
+                        result.message = "Cannot Like";
+                    }
                     result.result = true;
-                    result.message = postLike.likeStatus == 1 ? "Liked a Post" : "Disliked a Post";
+                   
                     
                 }
             }
@@ -202,6 +214,41 @@ namespace ReadRate.Controllers
                     else{
                         result.result = false;
                         result.message = "Cannot Create";
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                result.result = false;
+                result.message = ex.Message;
+            }
+            return result;
+        }
+
+        [HttpDelete, Route("[action]", Name ="DeletePost")]
+        public Result DeletePost (DeletePostModel postModel)
+        {
+            Result result = new Result();
+            try
+            {
+                _conn = new SqlConnection(configuration["ConnectionStrings:SqlConn"]);
+                _conn.Open();
+                using(_conn)
+                {
+                    SqlCommand cmd = new SqlCommand("DeletePost", _conn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@PostId", postModel.PostId);
+                    cmd.Parameters.AddWithValue("@UserId", postModel.UserId);
+                    int rows = cmd.ExecuteNonQuery();
+                    if(rows > 0)
+                    {
+                        result.result = true;
+                        result.message = "Deleted Successfully";
+                    }
+                    else
+                    {
+                        result.result = false;
+                        result.message = "Could not delete the post";
                     }
                 }
             }

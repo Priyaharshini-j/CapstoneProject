@@ -5,6 +5,7 @@
         public int PostId { get; set; }
         public string PostCaption { get; set; }
         public int UserId { get; set; }
+        public string UserName { get; set; }
         public int BookId { get; set; }
         public int Like { get; set; }
         public int DisLike { get; set; }
@@ -19,5 +20,11 @@
         public string ISBN { get; set; }
         public int UserId { get; set; }
 
+    }
+
+    public class DeletePostModel
+    {
+        public int PostId { get; set; }
+        public int UserId { get; set; }
     }
 }

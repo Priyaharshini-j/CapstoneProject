@@ -13,7 +13,9 @@
 
     public class AddPostLikeDislike
     {
-        public PostModel post { get; set; } 
-        public int likeStatus { get; set; }
+
+        public int UserId { get; set; } 
+        public int PostId { get; set; }
+        public int LikeStatus { get; set; }
     }
 }

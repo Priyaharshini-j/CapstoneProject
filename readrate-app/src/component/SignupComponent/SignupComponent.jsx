@@ -1,7 +1,6 @@
 import axios from 'axios'
 import React, { useState } from 'react'
 import './SignupComponent.css'
-import LoginComponent from '../LoginComponent/LoginComponent'
 import { useNavigate } from 'react-router'
 
 export const SignupComponent = () => {
@@ -43,9 +42,7 @@ export const SignupComponent = () => {
   }
 
   if (logIn) {
-
     navigate('/');
-    return <LoginComponent />;
   }
 
 
@@ -115,7 +112,7 @@ export const SignupComponent = () => {
 
             <div className="button-container">
               <button className="button" onClick={handleSignUp}>Sign Up</button>
-              <button className="button" onClick={(e) => setLogIn(true)}>Login... </button>
+              <button className="button" onClick={(e)=>navigate('/')}>Login... </button>
             </div>
           </div>
         </div>

@@ -40,6 +40,7 @@ const LoginComponent = () => {
 
   return (
     <React.Fragment>
+
       <div className='login-container'>
 
         <div className="card">

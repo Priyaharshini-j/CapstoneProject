@@ -112,20 +112,20 @@ const PostComponent = (props) => {
       <React.Fragment>
         {
           deleteAlert === true && (
-            <Alert severity="success">
+            <Alert onClose={()=> setDeleteAlert(null)} severity="success">
               <AlertTitle>Success</AlertTitle>
               Success — <strong>Successfully deleted the post of Yours</strong>
             </Alert>
           )
         }
         {deleteAlert === false && (
-          <Alert severity="error">
+          <Alert onClose={()=> setDeleteAlert(null)} severity="error">
             <AlertTitle>Error</AlertTitle>
             This is an error alert — <strong>Error in deleting your post</strong>
           </Alert>
         )}
         {LikeAlert === false && (
-          <Alert severity="error">
+          <Alert onClose={()=> setAlert(null)} severity="error">
             <AlertTitle>Error</AlertTitle>
             This is an error alert — <strong>You were already Liked this Post</strong>
           </Alert>

@@ -59,18 +59,18 @@ const CommunityComponent = (props) => {
   if (communityList === null) {
     return <CircularProgress/>;
   } else if (communityList[0].communityId === 0) {
-    return (<Alert severity='info'><AlertTitle>Info</AlertTitle> No Community Found on this book... <strong>Be the first to create your turf</strong></Alert>);
+    return (<Alert onClose={()=>{setAlert(null)}} severity='info'><AlertTitle>Info</AlertTitle> No Community Found on this book... <strong>Be the first to create your turf</strong></Alert>);
   } else {
     return (
       <React.Fragment>
         {alert === true && (
-          <Alert severity="success">
+          <Alert onClose={()=>{setAlert(null)}} severity="success">
             <AlertTitle>Success</AlertTitle>
             Successfully Followed the Community <strong>check it out by reloading the page!</strong>
           </Alert>
         )}
         {alert === false && (
-          <Alert severity="error">
+          <Alert onClose={()=>{setAlert(null)}} severity="error">
             <AlertTitle>Error</AlertTitle>
             This is an error alert — <strong>You were already a member of this community</strong>
           </Alert>

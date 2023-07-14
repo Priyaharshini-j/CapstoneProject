@@ -70,11 +70,6 @@ function BookPage(props) {
     setValue(newValue);
   };
 
-  const data = useMemo(() => ({
-    ISBN: location.state?.bookIsbn,
-    userId: userId,
-    Rating: rate
-  }), [rate]);
 
   const handleRate = (event, newValue) => {
     setRating(newValue);
@@ -296,26 +291,26 @@ function BookPage(props) {
               </div>
               {
                 ShelfAlert === true && (
-                  <Alert severity="success">
+                  <Alert onClose={()=>{setShelfAlert(null)}} severity="success">
                     <AlertTitle>Success</AlertTitle>
                     Successfully Added the Book to Your shelf <strong>check it out in Your Profile Page!</strong>
                   </Alert>
                 )}
               {ShelfAlert === false && (
-                <Alert severity="error">
+                <Alert onClose={()=>{setShelfAlert(null)}} severity="error">
                   <AlertTitle>Error</AlertTitle>
                   This is an error alert — <strong>You were already Added the Book to your shelf. Check it out in the Profile page</strong>
                 </Alert>
               )
               }
               {alert === true && (
-                <Alert severity="success">
+                <Alert onClose={()=>{setAlert(null)}} severity="success">
                   <AlertTitle>Success</AlertTitle>
                   Successfully Submitted the the Ratings <strong>check it out in Your Profile Page!</strong>
                 </Alert>
               )}
               {alert === false && (
-                <Alert severity="error">
+                <Alert onClose={()=>{setAlert(null)}} severity="error">
                   <AlertTitle>Error</AlertTitle>
                   This is an error alert — <strong>You were already submitted the Ratin. Check it out in the Profile page</strong>
                 </Alert>
@@ -340,13 +335,13 @@ function BookPage(props) {
             </Box>
             <TabPanel value="1">
               {commAlert === true && (
-                <Alert severity="success">
+                <Alert onClose={() => {setCommAlert(null)}} severity="success">
                   <AlertTitle>Success</AlertTitle>
                   Successfully Created the community <strong>check it out in Your Profile Page!</strong>
                 </Alert>
               )}
               {commAlert === false && (
-                <Alert severity="error">
+                <Alert onClose={() => {setCommAlert(null)}} severity="error">
                   <AlertTitle>Error</AlertTitle>
                   This is an error alert — <strong> There is an error occured while creating a community... Please Try again :&#40;</strong>
                 </Alert>
@@ -355,13 +350,13 @@ function BookPage(props) {
             </TabPanel>
             <TabPanel value="2">
               {criAlert === true && (
-                <Alert severity="success">
+                <Alert onClose={() => {setCriAlert(null)}} severity="success">
                   <AlertTitle>Success</AlertTitle>
                   Successfully Created the Critique <strong>check it out in Your Profile Page!</strong>
                 </Alert>
               )}
               {criAlert === false && (
-                <Alert severity="error">
+                <Alert onClose={() => {setCriAlert(null)}} severity="error">
                   <AlertTitle>Error</AlertTitle>
                   This is an error alert — <strong> There is an error occured while creating a Critique... Please Try again :&#40;</strong>
                 </Alert>

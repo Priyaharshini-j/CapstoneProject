@@ -7,7 +7,7 @@ import { AddShoppingCart, SearchTwoTone } from '@mui/icons-material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Link } from 'react-router-dom';
 import BookComponent from '../BookComponent/BookComponent';
-
+import redPanda from '../images/red-panda.gif'
 
 const SearchBarComponent = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,16 +42,16 @@ const SearchBarComponent = () => {
       const genre = searchBook.volumeInfo.categories?.[0] ?? null;
       const desc = searchBook.volumeInfo.description ?? null;
 
-      console.log("12",bookIsbn);
-      console.log("12",title)
-      console.log("12",author)
-      console.log("12",publisher)
-      console.log("12",publishedDate)
-      console.log("12",buyLink)
-      console.log("12",coverImage)
-      console.log("12",rating)
-      console.log("12",genre)
-      console.log("12",desc)
+      console.log("12", bookIsbn);
+      console.log("12", title)
+      console.log("12", author)
+      console.log("12", publisher)
+      console.log("12", publishedDate)
+      console.log("12", buyLink)
+      console.log("12", coverImage)
+      console.log("12", rating)
+      console.log("12", genre)
+      console.log("12", desc)
     } catch (error) {
       console.log(error);
     } finally {
@@ -79,13 +79,18 @@ const SearchBarComponent = () => {
   return (
     <React.Fragment>
       <div className='search-component-container'>
+        <div className='search-image'>
+          <img src={redPanda} alt='red-panda' width={'150px'}/>
+        </div>
         <div className="searchBox">
+
           <input className="searchInput" type="text" onChange={handleChange} placeholder="Search for books" />
-          
+
           <button className="searchButton" onClick={handleSubmit}>
-            <SearchTwoTone/>
+            <SearchTwoTone />
           </button>
         </div>
+
         <div className="search-result-container">
           {isLoading ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>

@@ -37,9 +37,27 @@ const CritiqueComponent = (props) => {
     PublishedDate: location.state?.publishedDate,
   };
   const userName = sessionStorage.getItem("userName");
-
+  const [deleteAlert, setDeleteAlert] = useState(null);
   const handleDeleteCritique = async (critiqueId) => {
     console.log(critiqueId)
+    console.log(sessionStorage.userId);
+    try {
+      const deleteData = {
+        critiqueId: parseInt(critiqueId),
+        userId: parseInt(sessionStorage.getItem("userId"))
+      }
+      const deleteResponse = await axios.delete("http://localhost:5278/api/Critique/DeleteReply", { data: deleteData });
+
+      if (deleteResponse.data.result === true) {
+        setDeleteAlert(true)
+      }
+      else {
+        setDeleteAlert(false)
+      }
+    }
+    catch (error) {
+      console.log(error)
+    }
   }
 
 
@@ -141,30 +159,42 @@ const CritiqueComponent = (props) => {
     }
 
     fetchCritiqueList();
-  }, [criAlert, alert]); // Empty dependency array to run the effect only once on page load
+  }, [criAlert, alert,deleteAlert]); // Empty dependency array to run the effect only once on page load
 
   return (
     <React.Fragment>
-      {criAlert === true && (
-        <Alert severity="success">
+      {deleteAlert === true && (
+        <Alert onClose={() => { setDeleteAlert(null) }} severity="success">
+          <AlertTitle>Success</AlertTitle>
+          Deleted the Critique— <strong>check it out by reloading the page!</strong>
+        </Alert>
+      )}
+      {deleteAlert === false && (
+        <Alert onClose={() => { setDeleteAlert(null) }} severity="error">
+          <AlertTitle>Error</AlertTitle>
+          This is an error alert — <strong>Can't delete this critique</strong>
+        </Alert>
+      )}
+      {criAlert === false && (
+        <Alert onClose={() => { setCriAlert(null) }} severity="success">
           <AlertTitle>Success</AlertTitle>
           Replied to the Critique— <strong>check it out by reloading the page!</strong>
         </Alert>
       )}
-      {criAlert === false && (
-        <Alert severity="error">
+      {criAlert === true && (
+        <Alert onClose={() => { setCriAlert(null) }} severity="error">
           <AlertTitle>Error</AlertTitle>
           This is an error alert — <strong>Can't send the reply to this critique</strong>
         </Alert>
       )}
       {alert === true && (
-        <Alert severity="success">
+        <Alert onClose={() => { setAlert(null) }} severity="success">
           <AlertTitle>Success</AlertTitle>
           Liked the Critique— <strong>check it out by reloading the page!</strong>
         </Alert>
       )}
       {alert === false && (
-        <Alert severity="error">
+        <Alert onClose={() => { setAlert(null) }} severity="error">
           <AlertTitle>Error</AlertTitle>
           This is an error alert — <strong>You have already Liked this Critique</strong>
         </Alert>
@@ -172,7 +202,7 @@ const CritiqueComponent = (props) => {
       <SimpleGrid spacing={4} templateColumns="repeat(auto-fill)" className="grid-container">
         {
           noCritiqueAlert === true && (
-            <Alert severity="info">
+            <Alert onClose={() => { setNoCritique(null) }} severity="info">
               <AlertTitle>Info</AlertTitle>
               No critique Found for this Book <strong>Be the first to state the facts about book...</strong>
             </Alert>
@@ -184,9 +214,9 @@ const CritiqueComponent = (props) => {
             variant="filled"
             style={{ outline: `1px solid primary`, backgroundColor: "#c5bdf9", borderRadius: '5px' }}
           >
-            <CardHeader bg="gray.100" p={4} sx={{display:'flex' , flexDirection:'row', justifyContent:'space-between'}}>
+            <CardHeader bg="gray.100" p={4} sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
               <Heading size="md">@{critique.userName}
-                </Heading>
+              </Heading>
               {
                 critique.userName === userName ? (<IconButton
                   aria-label="bookmark Bahamas Islands"
@@ -274,7 +304,7 @@ const CritiqueComponent = (props) => {
                   </Box>
                 )}
                 {replyAlert === false && (
-                  <Alert severity="warning">
+                  <Alert onClose={() => { setAlertReply(null) }} severity="warning">
                     <AlertTitle>No Reply Found</AlertTitle>
                     <strong>Be the First to Reply tp the Critique</strong>
                   </Alert>
